@@ -2,7 +2,7 @@ Changelog of reinout-arduino
 ===================================================
 
 
-0.1 (unreleased)
+0.1 (2015-11-01)
 ----------------
 
 - Started documentation in the README.
