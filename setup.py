@@ -10,6 +10,7 @@ long_description = '\n\n'.join([
 
 install_requires = [
     'setuptools',
+    'pyserial',
     ],
 
 tests_require = [
@@ -19,17 +20,16 @@ tests_require = [
 
 setup(name='reinout-arduino',
       version=version,
-      description="TODO",
+      description="Reinout's model railway arduino management project",
       long_description=long_description,
       # Get strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[],
       keywords=[],
-      author='TODO',
-      author_email='TODO@nelen-schuurmans.nl',
-      url='',
-      license='GPL',
+      author='Reinout van Rees',
+      author_email='reinout@vanrees.org',
+      url='https://github.com/reinout/reinout-arduino',
+      license='MIT',
       packages=['reinout_arduino'],
-      include_package_data=True,
       zip_safe=False,
       install_requires=install_requires,
       tests_require=tests_require,
