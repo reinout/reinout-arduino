@@ -17,7 +17,21 @@ reusable, in any case. And those'll be in separate repositories to make
 cloning/sharing/using them easier.
 
 
-Scratchpad for comments
------------------------
+OSX prerequisites
+-----------------
 
-Mention buildout setup.
+I'm building this all on OSX. What I used to get it all running is mostly from
+the `installation instructions of the bare-arduino-project <https://github.com/ladislas/Bare-Arduino-Project/blob/master/INSTALL.md>`_::
+
+    $ brew tap osx-cross/avr
+    $ brew install avr-libc
+    $ brew install avrdude
+
+The also-needed pyserial is a dependency in my ``setup.py``, so that's
+installed automatically by buildout.
+
+By buildout? Yes, I'm using buildout instead of virtualenv/pip so that I can
+use some of the automation I'm used to (like automatic sphinx documentation
+setup). Nobody else but me will need that part, so just make sure you're
+pip-installing the current directory as all my dependencies are neatly in the
+``setup.py``, of course :-)
