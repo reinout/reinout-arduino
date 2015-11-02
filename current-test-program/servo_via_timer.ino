@@ -3,7 +3,7 @@
 Servo servo1;
 
 int SERVO1_MIN = 1250;
-int SERVO1_MAX = 2000;
+int SERVO1_MAX = 1750;
 unsigned long SERVO1_DURATION_MS = 1200;
 unsigned long servo1_timestep_micros;
 unsigned long servo1_next_time_micros;
