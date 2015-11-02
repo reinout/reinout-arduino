@@ -25,9 +25,6 @@ void perhaps_update_servo1() {
   if (micros() > servo1_next_time_micros) {
     servo1_value += 1;
     if (servo1_value > SERVO1_MAX) {
-      // delay(1000);
-      // servo1_value = SERVO1_MIN;
-      // servo1_next_time_micros = micros();
       servo1.detach();
     }
     servo1_next_time_micros += servo1_timestep_micros;
