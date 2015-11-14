@@ -7,7 +7,7 @@ int MAIN_SIGNAL_MIN = 1300;
 int MAIN_SIGNAL_MAX = 1750;
 int MAIN_SIGNAL_DURATION_MS = 2200;
 int main_signal_timestep_ms;
-boolean mainSignalDone=false;
+boolean main_signal_done=false;
 unsigned int main_signal_next_time_ms;
 int main_signal_value;
 
@@ -15,7 +15,7 @@ int SECONDARY_SIGNAL_MIN = 1150;
 int SECONDARY_SIGNAL_MAX = 1750;
 int SECONDARY_SIGNAL_DURATION_MS = 2200;
 int secondary_signal_timestep_ms;
-boolean secondarySignalDone=false;
+boolean secondary_signal_done=false;
 unsigned int secondary_signal_next_time_ms;
 int secondary_signal_value;
 
@@ -43,10 +43,10 @@ void setup() {
 
 
 void perhaps_update_main_signal() {
-  if (millis() > main_signal_next_time_ms && !mainSignalDone) {
+  if (millis() > main_signal_next_time_ms && !main_signal_done) {
     main_signal_value++;
     if (main_signal_value > MAIN_SIGNAL_MAX) {
-      mainSignalDone=true;
+      main_signal_done = true;
       main_signal.detach();
       return;
     }
@@ -57,10 +57,10 @@ void perhaps_update_main_signal() {
 
 
 void perhaps_update_secondary_signal() {
-  if (millis() > secondary_signal_next_time_ms && !secondarySignalDone) {
+  if (millis() > secondary_signal_next_time_ms && !secondary_signal_done) {
     secondary_signal_value++;
     if (secondary_signal_value > SECONDARY_SIGNAL_MAX) {
-      secondarySignalDone=true;
+      secondary_signal_done = true;
       secondary_signal.detach();
       return;
     }
