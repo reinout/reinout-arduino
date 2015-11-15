@@ -16,7 +16,7 @@ ARDUINO_DIR       = /Applications/Arduino.app/Contents/Java
 
 ### USER_LIB_PATH
 ### Path to where the your project's libraries are stored.
-USER_LIB_PATH     :=  $(realpath $(PROJECT_DIR)/lib)
+USER_LIB_PATH     =  $(BASE_DIR)/lib
 
 ### BOARD_TAG & BOARD_SUB
 ### For Arduino IDE 1.0.x

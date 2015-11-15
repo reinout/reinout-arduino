@@ -36,5 +36,6 @@ setup(name='reinout-arduino',
       extras_require={'test': tests_require},
       entry_points={
           'console_scripts': [
+              'update-libraries = reinout_arduino.libraries:main',
           ]},
       )
