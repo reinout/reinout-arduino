@@ -37,5 +37,6 @@ setup(name='reinout-arduino',
       entry_points={
           'console_scripts': [
               'update-libraries = reinout_arduino.libraries:main',
+              'print-serial = reinout_arduino.serial:main',
           ]},
       )
