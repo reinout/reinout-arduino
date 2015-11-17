@@ -5,7 +5,10 @@ Changelog of reinout-arduino
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Using my own new servo library ('servomover').
+
+- Added quick python script for printing the serial communication from the
+  arduino.
 
 
 0.1 (2015-11-01)
