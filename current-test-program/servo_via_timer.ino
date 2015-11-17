@@ -1,81 +1,23 @@
 #include <Servo.h>
-#include <inttypes.h>
-#include <signal.h>
+#include <servomover.h>
 
-Signal main_signal=Signal(1300, 1750, 2200, 11);
-Servo secondary_signal;
+LinearServoMover upper_arm = LinearServoMover(11, 1300, 1750, 1200);
+LinearServoMover lower_arm = LinearServoMover(12, 1150, 1750, 1200);
 
-// int MAIN_SIGNAL_MIN = 1300;
-// int MAIN_SIGNAL_MAX = 1750;
-// int MAIN_SIGNAL_DURATION_MS = 2200;
-// int main_signal_timestep_ms;
-// boolean main_signal_done=false;
-// unsigned int main_signal_next_time_ms;
-// int main_signal_value;
-
-int SECONDARY_SIGNAL_MIN = 1150;
-int SECONDARY_SIGNAL_MAX = 1750;
-int SECONDARY_SIGNAL_DURATION_MS = 1200;
-int secondary_signal_timestep_ms;
-boolean secondary_signal_done=false;
-unsigned int secondary_signal_next_time_ms;
-int secondary_signal_value;
-
-int INITIAL_DELAY_MS = 500;
+int INITIAL_DELAY_MS = 2000;
 
 
 void setup() {
-  pinMode(13, OUTPUT);
+  upper_arm.init();
+  lower_arm.init();
+  delay(INITIAL_DELAY_MS);
+  upper_arm.move_to_max();
+  lower_arm.move_to_max();
 
-  main_signal.toMaxPos();
-  // main_signal.attach(11);
-  // main_signal_timestep_ms = (MAIN_SIGNAL_DURATION_MS) / (MAIN_SIGNAL_MAX - MAIN_SIGNAL_MIN);
-  // main_signal_value = MAIN_SIGNAL_MIN;
-  // main_signal.writeMicroseconds(main_signal_value);
-  // main_signal_next_time_ms = millis() + INITIAL_DELAY_MS;
-  // main_signal.writeMicroseconds(main_signal_value);
-
-  secondary_signal.attach(12);
-  secondary_signal_timestep_ms = (SECONDARY_SIGNAL_DURATION_MS) / (SECONDARY_SIGNAL_MAX - SECONDARY_SIGNAL_MIN);
-  secondary_signal_value = SECONDARY_SIGNAL_MIN;
-  secondary_signal.writeMicroseconds(secondary_signal_value);
-  secondary_signal_next_time_ms = millis() + INITIAL_DELAY_MS + 50;
-  secondary_signal.writeMicroseconds(secondary_signal_value);
-
-}
-
-
-// void perhaps_update_main_signal() {
-//   if (millis() > main_signal_next_time_ms && !main_signal_done) {
-//     main_signal_value++;
-//     if (main_signal_value > MAIN_SIGNAL_MAX) {
-//       main_signal_done = true;
-//       main_signal.detach();
-//       return;
-//     }
-//     main_signal_next_time_ms += main_signal_timestep_ms;
-//     main_signal.writeMicroseconds(main_signal_value);
-//   }
-// }
-
-
-void perhaps_update_secondary_signal() {
-  if (millis() > secondary_signal_next_time_ms && !secondary_signal_done) {
-    secondary_signal_value++;
-    if (secondary_signal_value > SECONDARY_SIGNAL_MAX) {
-      secondary_signal_done = true;
-      secondary_signal.detach();
-      return;
-    }
-    secondary_signal_next_time_ms += secondary_signal_timestep_ms;
-    secondary_signal.writeMicroseconds(secondary_signal_value);
-  }
 }
 
 
 void loop() {
-  uint64_t now=millis();
-  main_signal.update(now);
-  // perhaps_update_main_signal();
-  perhaps_update_secondary_signal();
+  upper_arm.perhaps_update();
+  lower_arm.perhaps_update();
 }
