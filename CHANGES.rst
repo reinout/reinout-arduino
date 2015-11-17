@@ -10,6 +10,9 @@ Changelog of reinout-arduino
 - Added quick python script for printing the serial communication from the
   arduino.
 
+- Added Bounce2 library and got the first hp0/hp1/hp2 signal working including
+  buttons. Hurray!
+
 
 0.1 (2015-11-01)
 ----------------
