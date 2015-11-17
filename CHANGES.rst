@@ -2,7 +2,7 @@ Changelog of reinout-arduino
 ===================================================
 
 
-0.2 (unreleased)
+0.2 (2015-11-17)
 ----------------
 
 - Using my own new servo library ('servomover').
