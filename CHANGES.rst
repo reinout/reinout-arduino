@@ -5,7 +5,11 @@ Changelog of reinout-arduino
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Using my own 'signalmover' library that works together with the 'servomover'
+  one.
+
+- Added ``signals/`` directory for storing ``Makefile`` + ``*.ino`` for the
+  individual signals.
 
 
 0.2 (2015-11-17)
