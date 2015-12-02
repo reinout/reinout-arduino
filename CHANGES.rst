@@ -2,7 +2,7 @@ Changelog of reinout-arduino
 ===================================================
 
 
-0.3 (unreleased)
+0.3 (2015-12-02)
 ----------------
 
 - Using my own 'signalmover' library that works together with the 'servomover'
