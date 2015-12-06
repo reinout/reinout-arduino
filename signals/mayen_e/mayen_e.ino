@@ -3,7 +3,7 @@
 #include <signalmover.h>
 #include <Bounce2.h>
 
-LinearServoMover upper_arm = LinearServoMover(4, 1201, 1850, 800);
+LinearServoMover upper_arm = LinearServoMover(4, 1451, 1850, 600);
 int HP1_BUTTON_PIN = 2;
 
 SingleSignalMover signal = SingleSignalMover(&upper_arm, HP1_BUTTON_PIN);
