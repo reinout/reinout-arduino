@@ -6,6 +6,9 @@ LIB_DIR = 'lib'
 PATTERNS = ['*.h', '*.cpp']
 
 
+# Is this still needed? I don't think so. [2016-01-19]
+
+
 def main():
     """update-libraries program: make symlinks to the libraries in lib/"""
     # Assumption: we're in the main buildout directory.
