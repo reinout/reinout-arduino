@@ -5,7 +5,8 @@ Changelog of reinout-arduino
 0.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added Kelberg 'A' signal which uses my new 'pulsemover' library to steer
+  Viessmann slow-moving signals.
 
 
 0.3 (2015-12-02)
