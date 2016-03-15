@@ -57,5 +57,5 @@ endif
 
 ### MONITOR_PORT
 ### The port your board is connected to. Using an '*' tries all the ports and finds the right one.
-# MONITOR_PORT      = /dev/tty.wchusbserial1420
-MONITOR_PORT      = /dev/tty.wchusbserial1410
+MONITOR_PORT      = /dev/tty.wchusbserial1420
+# MONITOR_PORT      = /dev/tty.wchusbserial1410
