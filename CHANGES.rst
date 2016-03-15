@@ -2,7 +2,7 @@ Changelog of reinout-arduino
 ===================================================
 
 
-0.4 (unreleased)
+0.4 (2016-03-16)
 ----------------
 
 - Added Kelberg 'A' signal which uses my new 'pulsemover' library to steer
