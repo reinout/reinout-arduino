@@ -38,6 +38,8 @@ int OUTPUT_SIGNAL_A2 = 1;
 
 
 
+// Locking table = verschlusstafel
+
 void setup() {
 }
 
