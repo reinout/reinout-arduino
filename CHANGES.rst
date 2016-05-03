@@ -5,7 +5,7 @@ Changelog of reinout-arduino
 0.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Started with 'Kelberg' signalbox (arduino mega) project.
 
 
 0.4 (2016-03-16)
