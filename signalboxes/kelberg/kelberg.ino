@@ -172,7 +172,8 @@ void update_blocks() {
 
 
 void change_position(int number,
-                     int new_position) {
+                     boolean new_position) {
+  // DEBUG LED TO SHOF IF POSITION-CHANGE happens correctly.
   if (new_position == MINUS) {
     digitalWrite(13, HIGH);
   }
@@ -195,7 +196,7 @@ void change_position(int number,
 
 
 void react_to_movement(int number,
-                       int new_position) {
+                       boolean new_position) {
   if (movement_allowed(number)) {
     change_position(number, new_position);
   }
