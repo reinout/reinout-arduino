@@ -253,7 +253,7 @@ void setup() {
   levers[ROUTE_A_FIXATION].attach(PIN_BUTTON_ROUTE_A_FIXATION, INPUT_PULLUP);
 
   for (int number = 0; number < ARRAY_SIZE; number++) {
-    levers[number].interval(20);
+    levers[number].interval(200);
   }
   // Special case: route fixation button should take a second to activate.
   levers[ROUTE_A_FIXATION].interval(1000);
