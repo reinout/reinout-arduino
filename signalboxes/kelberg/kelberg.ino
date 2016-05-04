@@ -231,16 +231,6 @@ void update_single_lever_led(int pin, int number) {
   }
 }
 
-/* void update_single_lever_led(int pin, int number) { */
-/*   if ((millis() % 1000) > 500) { */
-/*     digitalWrite(pin, HIGH); */
-/*   } */
-/*   else { */
-/*     digitalWrite(pin, LOW); */
-/*   } */
-/* } */
-
-// xxxx
 
 void setup() {
   pinMode(13, OUTPUT);
