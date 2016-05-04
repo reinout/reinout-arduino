@@ -233,6 +233,7 @@ void update_single_lever_led(int pin, int number) {
 
 
 void setup() {
+  // Debug led 13 stuff
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
 
