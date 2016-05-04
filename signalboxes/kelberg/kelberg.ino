@@ -238,20 +238,31 @@ void setup() {
   digitalWrite(13, LOW);
 
   // Attach the pins and hook up react_to_movement() functions.
-  for (int number = 0; number < ARRAY_SIZE; number++) {
-    levers[number] = Bounce();
-  }
+  // for (int number = 0; number < ARRAY_SIZE; number++) {
+  //   levers[number] = Bounce();
+  // }
 
-  levers[SWITCH_5].attach(PIN_LEVER_SWITCH_5, INPUT_PULLUP);
-  levers[SWITCH_1].attach(PIN_LEVER_SWITCH_1, INPUT_PULLUP);
-  levers[SWITCHING_PERMISSION].attach(PIN_LOCK_SWITCHING_PERMISSION, INPUT_PULLUP);
-  levers[ROUTE_A1].attach(PIN_LEVER_ROUTE_A1, INPUT_PULLUP);
-  levers[ROUTE_A2].attach(PIN_LEVER_ROUTE_A2, INPUT_PULLUP);
-  levers[ROUTE_BERENBACH1].attach(PIN_LEVER_ROUTE_BERENBACH1, INPUT_PULLUP);
-  levers[ROUTE_BERENBACH2].attach(PIN_LEVER_ROUTE_BERENBACH2, INPUT_PULLUP);
-  levers[SIGNAL_A1].attach(PIN_LEVER_SIGNAL_A1, INPUT_PULLUP);
-  levers[SIGNAL_A2].attach(PIN_LEVER_SIGNAL_A2, INPUT_PULLUP);
-  levers[ROUTE_A_FIXATION].attach(PIN_BUTTON_ROUTE_A_FIXATION, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SWITCH_5, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SWITCH_1, INPUT_PULLUP);
+  pinMode(PIN_LOCK_SWITCHING_PERMISSION, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_A1, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_A2, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_BERENBACH1, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_BERENBACH2, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SIGNAL_A1, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SIGNAL_A2, INPUT_PULLUP);
+  pinMode(PIN_BUTTON_ROUTE_A_FIXATION, INPUT_PULLUP);
+
+  levers[SWITCH_5].attach(PIN_LEVER_SWITCH_5);
+  levers[SWITCH_1].attach(PIN_LEVER_SWITCH_1);
+  levers[SWITCHING_PERMISSION].attach(PIN_LOCK_SWITCHING_PERMISSION);
+  levers[ROUTE_A1].attach(PIN_LEVER_ROUTE_A1);
+  levers[ROUTE_A2].attach(PIN_LEVER_ROUTE_A2);
+  levers[ROUTE_BERENBACH1].attach(PIN_LEVER_ROUTE_BERENBACH1);
+  levers[ROUTE_BERENBACH2].attach(PIN_LEVER_ROUTE_BERENBACH2);
+  levers[SIGNAL_A1].attach(PIN_LEVER_SIGNAL_A1);
+  levers[SIGNAL_A2].attach(PIN_LEVER_SIGNAL_A2);
+  levers[ROUTE_A_FIXATION].attach(PIN_BUTTON_ROUTE_A_FIXATION);
 
   for (int number = 0; number < ARRAY_SIZE; number++) {
     levers[number].interval(200);
