@@ -234,15 +234,13 @@ void update_single_lever_led(int pin, int number) {
 
 
 void setup() {
-  // Debug led 13 stuff
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
 
   // Attach the pins and hook up react_to_movement() functions.
   // for (int number = 0; number < ARRAY_SIZE; number++) {
   //   levers[number] = Bounce();
   // }
 
+  // Define lever pin modes.
   pinMode(PIN_LEVER_SWITCH_5, INPUT_PULLUP);
   pinMode(PIN_LEVER_SWITCH_1, INPUT_PULLUP);
   pinMode(PIN_LOCK_SWITCHING_PERMISSION, INPUT_PULLUP);
@@ -254,6 +252,21 @@ void setup() {
   pinMode(PIN_LEVER_SIGNAL_A2, INPUT_PULLUP);
   pinMode(PIN_BUTTON_ROUTE_A_FIXATION, INPUT_PULLUP);
 
+  // Attach the LEDs.
+  pinMode(13, OUTPUT);
+  pinMode(PIN_LED_SWITCH_5, OUTPUT);
+  pinMode(PIN_LED_SWITCH_1, OUTPUT);
+  pinMode(PIN_LED_SIGNAL_A2, OUTPUT);
+  pinMode(PIN_LED_SIGNAL_A1, OUTPUT);
+  pinMode(PIN_LED_SWITCHING_PERMISSION, OUTPUT);
+  pinMode(PIN_LED_ROUTE_A, OUTPUT);
+  pinMode(PIN_LED_ROUTE_BERENBACH, OUTPUT);
+  pinMode(PIN_LED_ROUTE_A_FIXATION, OUTPUT);
+
+  // Debug led 13 stuff
+  digitalWrite(13, LOW);
+
+  // Attach pins to lever Bounce objects.
   levers[SWITCH_5].attach(PIN_LEVER_SWITCH_5);
   levers[SWITCH_1].attach(PIN_LEVER_SWITCH_1);
   levers[SWITCHING_PERMISSION].attach(PIN_LOCK_SWITCHING_PERMISSION);
@@ -270,16 +283,6 @@ void setup() {
   }
   // Special case: route fixation button should take a second to activate.
   levers[ROUTE_A_FIXATION].interval(1000);
-
-  // Attach the LEDs.
-  pinMode(PIN_LED_SWITCH_5, OUTPUT);
-  pinMode(PIN_LED_SWITCH_1, OUTPUT);
-  pinMode(PIN_LED_SIGNAL_A2, OUTPUT);
-  pinMode(PIN_LED_SIGNAL_A1, OUTPUT);
-  pinMode(PIN_LED_SWITCHING_PERMISSION, OUTPUT);
-  pinMode(PIN_LED_ROUTE_A, OUTPUT);
-  pinMode(PIN_LED_ROUTE_BERENBACH, OUTPUT);
-  pinMode(PIN_LED_ROUTE_A_FIXATION, OUTPUT);
 
   // TODO: look up the initial lever positions and update accordingly.
 }
