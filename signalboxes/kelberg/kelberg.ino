@@ -3,35 +3,35 @@
 #include <Bounce2.h>
 
 // Red LEDs named after the signal/switch lever/etc they're for.
-// Labeled as a8-a15, so 89-82
-int PIN_LED_SWITCH_5 = 89;  // a8
-int PIN_LED_SWITCH_1 = 88;
-int PIN_LED_SIGNAL_A2 = 87;
-int PIN_LED_SIGNAL_A1 = 86;
-int PIN_LED_SWITCHING_PERMISSION = 85;
-int PIN_LED_ROUTE_A = 84;
-int PIN_LED_ROUTE_BERENBACH = 83;
+// These are the analog ports labeled as a8-a15.
+int PIN_LED_SWITCH_5 = A8;
+int PIN_LED_SWITCH_1 = A9;
+int PIN_LED_SIGNAL_A1 = A10;
+int PIN_LED_SIGNAL_A2 = A11;
+int PIN_LED_SWITCHING_PERMISSION = A12;
+int PIN_LED_ROUTE_A = A13;
+int PIN_LED_ROUTE_BERENBACH = A14;
 // White LED
-int PIN_LED_ROUTE_A_FIXATION = 82;  // a15
+int PIN_LED_ROUTE_A_FIXATION = A15;
 
 // Levers and lock
-int PIN_LEVER_SWITCH_5 = 78;  // d22
-int PIN_LEVER_SWITCH_1 = 76;  // d24
-int PIN_LEVER_SIGNAL_A2 = 74;  // d26
-int PIN_LEVER_SIGNAL_A1 = 72;  // d28
-int PIN_LOCK_SWITCHING_PERMISSION = 58;  // d32
+int PIN_LEVER_SWITCH_5 = 22;
+int PIN_LEVER_SWITCH_1 = 24;
+int PIN_LEVER_SIGNAL_A1 = 26;
+int PIN_LEVER_SIGNAL_A2 = 28;
+int PIN_LOCK_SWITCHING_PERMISSION = 32;
 // Route levers
-int PIN_LEVER_ROUTE_A1 = 54;  // d36
-int PIN_LEVER_ROUTE_A2 = 50;  // d38
-int PIN_LEVER_ROUTE_BERENBACH1 = 52;  // d40
-int PIN_LEVER_ROUTE_BERENBACH2 = 42;  // d42
+int PIN_LEVER_ROUTE_A1 = 36;
+int PIN_LEVER_ROUTE_A2 = 38;
+int PIN_LEVER_ROUTE_BERENBACH1 = 40;
+int PIN_LEVER_ROUTE_BERENBACH2 = 42;
 // Push button for route fixing
-int PIN_BUTTON_ROUTE_A_FIXATION = 38;  // d46
+int PIN_BUTTON_ROUTE_A_FIXATION = 46;
 // Output pins (pull to 0 means go out of the ground position)
-int PIN_OUTPUT_SWITCH_5 = 6;  // pwm 2 TODO
-int PIN_OUTPUT_SWITCH_1 = 7;  // pwm 3 TODO
-int PIN_OUTPUT_SIGNAL_A1 = 1;  // pwm 4 TODO
-int PIN_OUTPUT_SIGNAL_A2 = 5;  // pwm 5 TODO
+int PIN_OUTPUT_SWITCH_5 = 2;
+int PIN_OUTPUT_SWITCH_1 = 3;
+int PIN_OUTPUT_SIGNAL_A1 = 4;
+int PIN_OUTPUT_SIGNAL_A2 = 5;
 
 // Array index numbers. These are columns in the locking table.
 int SWITCH_5 = 0;
@@ -215,7 +215,7 @@ void react_to_movement(int number,
 
 void update_single_lever_led(int pin, int number) {
   if (position_is_ok[number] == false) {
-    if ((millis() % 1000) > 500) {
+    if ((millis() % 500) > 250) {
       digitalWrite(pin, HIGH);
     }
     else {
@@ -231,6 +231,28 @@ void update_single_lever_led(int pin, int number) {
     }
   }
 }
+
+
+void update_dual_lever_led(int pin, int number1, int number2) {
+  if (position_is_ok[number1] == false || position_is_ok[number2] == false) {
+    if ((millis() % 500) > 250) {
+      digitalWrite(pin, HIGH);
+    }
+    else {
+      digitalWrite(pin, LOW);
+    }
+  }
+  else {
+    if (movement_allowed(number1) || movement_allowed(number2)) {
+      digitalWrite(pin, LOW);
+    }
+    else {
+      digitalWrite(pin, HIGH);
+    }
+  }
+
+}
+
 
 
 void setup() {
@@ -284,7 +306,18 @@ void setup() {
   // Special case: route fixation button should take a second to activate.
   levers[ROUTE_A_FIXATION].interval(1000);
 
-  // TODO: look up the initial lever positions and update accordingly.
+  // look up the initial lever positions and update accordingly.
+  for (int number = 0; number < ARRAY_SIZE; number++) {
+    levers[number].update();
+
+    if (levers[number].read() == HIGH) {
+      react_to_movement(number, PLUS);
+    }
+    else {
+      react_to_movement(number, MINUS);
+    }
+  }
+
 }
 
 
@@ -298,14 +331,22 @@ void loop() {
       react_to_movement(number, MINUS);
     }
   }
-  // TODO: update the LEDs.
+  // Update the LEDs.
   update_single_lever_led(PIN_LED_SWITCH_5, SWITCH_5);
   update_single_lever_led(PIN_LED_SWITCH_1, SWITCH_1);
   update_single_lever_led(PIN_LED_SIGNAL_A1, SIGNAL_A1);
-  update_single_lever_led(13, SIGNAL_A1);
   update_single_lever_led(PIN_LED_SIGNAL_A2, SIGNAL_A2);
   update_single_lever_led(PIN_LED_SWITCHING_PERMISSION, SWITCHING_PERMISSION);
-  // TODO: Update other three leds
+
+  update_dual_lever_led(PIN_LED_ROUTE_A, ROUTE_A1, ROUTE_A2);
+  update_dual_lever_led(PIN_LED_ROUTE_BERENBACH, ROUTE_BERENBACH1, ROUTE_BERENBACH2);
+
+  if (current_position[ROUTE_A_FIXATION] == PLUS) {
+    digitalWrite(PIN_LED_ROUTE_A_FIXATION, LOW);
+  }
+  else {
+    digitalWrite(PIN_LED_ROUTE_A_FIXATION, HIGH);
+  }
 
   // TODO: update the outgoing pins.
 }
