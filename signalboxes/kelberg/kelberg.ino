@@ -28,10 +28,11 @@ int PIN_LEVER_ROUTE_BERENBACH2 = 42;
 // Push button for route fixing
 int PIN_BUTTON_ROUTE_A_FIXATION = 46;
 // Output pins (pull to 0 means go out of the ground position)
-int PIN_OUTPUT_SWITCH_5 = 2;
-int PIN_OUTPUT_SWITCH_1 = 3;
-int PIN_OUTPUT_SIGNAL_A1 = 4;
-int PIN_OUTPUT_SIGNAL_A2 = 5;
+int PIN_OUTPUT_SWITCH_1 = A1;
+int PIN_OUTPUT_SWITCH_5 =A2;
+int PIN_OUTPUT_SIGNAL_A1 = A5;
+int PIN_OUTPUT_SIGNAL_A2 = A4;
+
 
 // Array index numbers. These are columns in the locking table.
 int SWITCH_5 = 0;
@@ -171,24 +172,56 @@ void update_blocks() {
 }
 
 
-void change_position(int number,
-                     boolean new_position) {
-  // DEBUG LED TO SHOF IF POSITION-CHANGE happens correctly.
-  if (new_position == MINUS) {
-    digitalWrite(13, HIGH);
+void update_outputs() {
+  // Active: pull to zero.
+  if (current_position[SWITCH_1] == PLUS) {
+    digitalWrite(PIN_OUTPUT_SWITCH_1, HIGH);
   }
   else {
-    digitalWrite(13, LOW);
+    digitalWrite(PIN_OUTPUT_SWITCH_1, LOW);
   }
+  if (current_position[SWITCH_5] == PLUS) {
+    digitalWrite(PIN_OUTPUT_SWITCH_5, HIGH);
+  }
+  else {
+    digitalWrite(PIN_OUTPUT_SWITCH_5, LOW);
+  }
+  if (current_position[SIGNAL_A1] == PLUS) {
+    digitalWrite(PIN_OUTPUT_SIGNAL_A1, HIGH);
+  }
+  else {
+    digitalWrite(PIN_OUTPUT_SIGNAL_A1, LOW);
+  }
+  if (current_position[SIGNAL_A2] == PLUS) {
+    digitalWrite(PIN_OUTPUT_SIGNAL_A2, HIGH);
+  }
+  else {
+    digitalWrite(PIN_OUTPUT_SIGNAL_A2, LOW);
+  }
+}
+
+
+void change_position(int number,
+                     boolean new_position) {
 
   current_position[number] = new_position;
   position_is_ok[number] = true;
+
   update_requirements();
   update_blocks();
+  update_outputs();
 
   // Special case: signals going back to PLUS free the route fixation.
+  // It also marks the related route as disallowed so that the handle
+  // shows up as having to change.
   if (number == SIGNAL_A1 || number == SIGNAL_A2) {
     if (new_position == PLUS) {
+      if (current_position[ROUTE_A1] == MINUS) {
+        position_is_ok[ROUTE_A1] = false;
+      }
+      if (current_position[ROUTE_A2] == MINUS) {
+        position_is_ok[ROUTE_A2] = false;
+      }
       change_position(ROUTE_A_FIXATION, PLUS);
     }
   }
@@ -254,7 +287,6 @@ void update_dual_lever_led(int pin, int number1, int number2) {
 }
 
 
-
 void setup() {
 
   // Attach the pins and hook up react_to_movement() functions.
@@ -285,8 +317,17 @@ void setup() {
   pinMode(PIN_LED_ROUTE_BERENBACH, OUTPUT);
   pinMode(PIN_LED_ROUTE_A_FIXATION, OUTPUT);
 
+  // Attach the output pins
+  pinMode(PIN_OUTPUT_SWITCH_1, OUTPUT);
+  pinMode(PIN_OUTPUT_SWITCH_5, OUTPUT);
+  pinMode(PIN_OUTPUT_SIGNAL_A1, OUTPUT);
+  pinMode(PIN_OUTPUT_SIGNAL_A2, OUTPUT);
+
   // Debug led 13 stuff
   digitalWrite(13, LOW);
+
+  // First make sure the output pins are OK
+  update_outputs();
 
   // Attach pins to lever Bounce objects.
   levers[SWITCH_5].attach(PIN_LEVER_SWITCH_5);
