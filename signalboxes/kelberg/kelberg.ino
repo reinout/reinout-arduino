@@ -345,7 +345,7 @@ void setup() {
     levers[number].interval(200);
   }
   // Special case: route fixation button should take three seconds to activate.
-  levers[ROUTE_A_FIXATION].interval(3000);
+  levers[ROUTE_A_FIXATION].interval(2000);
 
   // look up the initial lever positions and update accordingly.
   for (int number = 0; number < ARRAY_SIZE; number++) {
