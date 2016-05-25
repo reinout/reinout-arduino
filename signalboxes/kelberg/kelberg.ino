@@ -101,6 +101,15 @@ void update_requirements() {
     requirements_fulfilled[ROUTE_P2] = true;
   }
 
+  // If a route switch is MINUS, it can be fixated.
+  requirements_fulfilled[ROUTE_AP_FIXATION] = false;
+  if (current_position[ROUTE_A1] == MINUS ||
+      current_position[ROUTE_A2] == MINUS ||
+      current_position[ROUTE_P1] == MINUS ||
+      current_position[ROUTE_P2] == MINUS) {
+    requirements_fulfilled[ROUTE_AP_FIXATION] = true;
+  }
+
 }
 
 
