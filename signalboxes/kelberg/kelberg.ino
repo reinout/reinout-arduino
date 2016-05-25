@@ -10,11 +10,11 @@ int PIN_LED_SIGNAL_A1 = A10;
 int PIN_LED_SIGNAL_A2 = A11;
 int PIN_LED_SWITCHING_PERMISSION = A12;
 int PIN_LED_ROUTE_A = A13;
-int PIN_LED_ROUTE_BERENBACH = A14;
+int PIN_LED_ROUTE_P = A14;
 // White LED
-int PIN_LED_ROUTE_A_FIXATION = A15;
+int PIN_LED_ROUTE_AP_FIXATION = A15;
 // Blue LED in "route recall" box
-int PIN_LED_ROUTE_A_RECALL = 49;
+int PIN_LED_ROUTE_AP_RECALL = 49;
 
 // Levers and lock
 int PIN_LEVER_SWITCH_5 = 22;
@@ -25,12 +25,12 @@ int PIN_LOCK_SWITCHING_PERMISSION = 32;
 // Route levers
 int PIN_LEVER_ROUTE_A1 = 36;
 int PIN_LEVER_ROUTE_A2 = 38;
-int PIN_LEVER_ROUTE_BERENBACH1 = 40;
-int PIN_LEVER_ROUTE_BERENBACH2 = 42;
+int PIN_LEVER_ROUTE_P1 = 40;
+int PIN_LEVER_ROUTE_P2 = 42;
 // Push button for route fixing
-int PIN_BUTTON_ROUTE_A_FIXATION = 46;
+int PIN_BUTTON_ROUTE_AP_FIXATION = 46;
 // Switch/lock for route recall
-int PIN_LOCK_ROUTE_A_RECALL = 47;
+int PIN_LOCK_ROUTE_AP_RECALL = 47;
 
 // Output pins (pull to 0 means go out of the ground position)
 int PIN_OUTPUT_SWITCH_1 = A1;
@@ -45,12 +45,12 @@ int SWITCH_1 = 1;
 int SWITCHING_PERMISSION = 2;  // Note: PLUS means 'key in lock'.
 int ROUTE_A1 = 3;
 int ROUTE_A2 = 4;
-int ROUTE_BERENBACH1 = 5;
-int ROUTE_BERENBACH2 = 6;
-int ROUTE_A_FIXATION = 7;
+int ROUTE_P1 = 5;
+int ROUTE_P2 = 6;
+int ROUTE_AP_FIXATION = 7;
 int SIGNAL_A1 = 8;
 int SIGNAL_A2 = 9;
-int ROUTE_A_RECALL = 10;
+int ROUTE_AP_RECALL = 10;
 
 // The two possible positions. Plus is the default, minus the actuated state.
 bool PLUS = true;
@@ -80,8 +80,8 @@ void update_requirements() {
   // Requirements fulfilled by the switches.
   requirements_fulfilled[ROUTE_A1] = false;
   requirements_fulfilled[ROUTE_A2] = false;
-  requirements_fulfilled[ROUTE_BERENBACH1] = false;
-  requirements_fulfilled[ROUTE_BERENBACH2] = false;
+  requirements_fulfilled[ROUTE_P1] = false;
+  requirements_fulfilled[ROUTE_P2] = false;
   if (current_position[SWITCH_5] == PLUS &&
       current_position[SWITCH_1] == PLUS &&
       current_position[SWITCHING_PERMISSION] == PLUS) {
@@ -94,11 +94,11 @@ void update_requirements() {
   }
   if (current_position[SWITCH_1] == PLUS &&
       current_position[SWITCHING_PERMISSION] == PLUS) {
-    requirements_fulfilled[ROUTE_BERENBACH1] = true;
+    requirements_fulfilled[ROUTE_P1] = true;
   }
   if (current_position[SWITCH_1] == MINUS &&
       current_position[SWITCHING_PERMISSION] == PLUS) {
-    requirements_fulfilled[ROUTE_BERENBACH2] = true;
+    requirements_fulfilled[ROUTE_P2] = true;
   }
 
 }
@@ -116,8 +116,8 @@ void update_blocks() {
   // Route levers block each other. And they block switches.
   if (current_position[ROUTE_A1] == MINUS) {
     blocked[ROUTE_A2] = true;
-    blocked[ROUTE_BERENBACH1] = true;
-    blocked[ROUTE_BERENBACH2] = true;
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P2] = true;
 
     blocked[SWITCH_5] = true;
     blocked[SWITCH_1] = true;
@@ -125,37 +125,39 @@ void update_blocks() {
   }
   if (current_position[ROUTE_A2] == MINUS) {
     blocked[ROUTE_A1] = true;
-    blocked[ROUTE_BERENBACH1] = true;
-    blocked[ROUTE_BERENBACH2] = true;
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P2] = true;
 
     blocked[SWITCH_5] = true;
     blocked[SWITCH_1] = true;
     blocked[SWITCHING_PERMISSION] = true;
   }
-  if (current_position[ROUTE_BERENBACH1] == MINUS) {
+  if (current_position[ROUTE_P1] == MINUS) {
     blocked[ROUTE_A1] = true;
     blocked[ROUTE_A2] = true;
-    blocked[ROUTE_BERENBACH2] = true;
+    blocked[ROUTE_P2] = true;
 
     blocked[SWITCH_1] = true;
     blocked[SWITCHING_PERMISSION] = true;
   }
-  if (current_position[ROUTE_BERENBACH2] == MINUS) {
+  if (current_position[ROUTE_P2] == MINUS) {
     blocked[ROUTE_A1] = true;
     blocked[ROUTE_A2] = true;
-    blocked[ROUTE_BERENBACH1] = true;
+    blocked[ROUTE_P1] = true;
 
     blocked[SWITCH_1] = true;
     blocked[SWITCHING_PERMISSION] = true;
   }
 
   // Route fixation blocks routes.
-  if (current_position[ROUTE_A_FIXATION] == MINUS) {
+  if (current_position[ROUTE_AP_FIXATION] == MINUS) {
     blocked[ROUTE_A1] = true;
     blocked[ROUTE_A2] = true;
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P2] = true;
     // Special case: also keep yourself blocked (it is only un-blocked by
     // moving a signal back to PLUS).
-    blocked[ROUTE_A_FIXATION] = true;
+    blocked[ROUTE_AP_FIXATION] = true;
   }
 
   // Signals also block routes.
@@ -209,8 +211,8 @@ void change_position(int number,
   // it can be thrown once (instead of through normal requirements, then it
   // would have been possible to throw it multiple times). It also enables the
   // corresponding route recall.
-  if (number == ROUTE_A_FIXATION && new_position == MINUS) {
-    requirements_fulfilled[ROUTE_A_RECALL] = true;
+  if (number == ROUTE_AP_FIXATION && new_position == MINUS) {
+    requirements_fulfilled[ROUTE_AP_RECALL] = true;
     if (current_position[ROUTE_A1] == MINUS) {
       requirements_fulfilled[SIGNAL_A1] = true;
     }
@@ -220,9 +222,9 @@ void change_position(int number,
   }
 
   // Special case: route recall frees the route fixation.
-  if (number == ROUTE_A_RECALL) {
+  if (number == ROUTE_AP_RECALL) {
     // Any new position is OK, we don't care which way the lock is turned.
-    change_position(ROUTE_A_FIXATION, PLUS);
+    change_position(ROUTE_AP_FIXATION, PLUS);
   }
 
   // Special case: signals going back to PLUS remove their own "requirements
@@ -309,12 +311,12 @@ void setup() {
   pinMode(PIN_LOCK_SWITCHING_PERMISSION, INPUT_PULLUP);
   pinMode(PIN_LEVER_ROUTE_A1, INPUT_PULLUP);
   pinMode(PIN_LEVER_ROUTE_A2, INPUT_PULLUP);
-  pinMode(PIN_LEVER_ROUTE_BERENBACH1, INPUT_PULLUP);
-  pinMode(PIN_LEVER_ROUTE_BERENBACH2, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_P1, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_P2, INPUT_PULLUP);
   pinMode(PIN_LEVER_SIGNAL_A1, INPUT_PULLUP);
   pinMode(PIN_LEVER_SIGNAL_A2, INPUT_PULLUP);
-  pinMode(PIN_BUTTON_ROUTE_A_FIXATION, INPUT_PULLUP);
-  pinMode(PIN_LOCK_ROUTE_A_RECALL, INPUT_PULLUP);
+  pinMode(PIN_BUTTON_ROUTE_AP_FIXATION, INPUT_PULLUP);
+  pinMode(PIN_LOCK_ROUTE_AP_RECALL, INPUT_PULLUP);
 
   // Attach the LEDs.
   pinMode(13, OUTPUT);
@@ -324,9 +326,9 @@ void setup() {
   pinMode(PIN_LED_SIGNAL_A1, OUTPUT);
   pinMode(PIN_LED_SWITCHING_PERMISSION, OUTPUT);
   pinMode(PIN_LED_ROUTE_A, OUTPUT);
-  pinMode(PIN_LED_ROUTE_BERENBACH, OUTPUT);
-  pinMode(PIN_LED_ROUTE_A_FIXATION, OUTPUT);
-  pinMode(PIN_LED_ROUTE_A_RECALL, OUTPUT);
+  pinMode(PIN_LED_ROUTE_P, OUTPUT);
+  pinMode(PIN_LED_ROUTE_AP_FIXATION, OUTPUT);
+  pinMode(PIN_LED_ROUTE_AP_RECALL, OUTPUT);
 
   // Attach the output pins
   pinMode(PIN_OUTPUT_SWITCH_1, OUTPUT);
@@ -346,18 +348,18 @@ void setup() {
   levers[SWITCHING_PERMISSION].attach(PIN_LOCK_SWITCHING_PERMISSION);
   levers[ROUTE_A1].attach(PIN_LEVER_ROUTE_A1);
   levers[ROUTE_A2].attach(PIN_LEVER_ROUTE_A2);
-  levers[ROUTE_BERENBACH1].attach(PIN_LEVER_ROUTE_BERENBACH1);
-  levers[ROUTE_BERENBACH2].attach(PIN_LEVER_ROUTE_BERENBACH2);
+  levers[ROUTE_P1].attach(PIN_LEVER_ROUTE_P1);
+  levers[ROUTE_P2].attach(PIN_LEVER_ROUTE_P2);
   levers[SIGNAL_A1].attach(PIN_LEVER_SIGNAL_A1);
   levers[SIGNAL_A2].attach(PIN_LEVER_SIGNAL_A2);
-  levers[ROUTE_A_FIXATION].attach(PIN_BUTTON_ROUTE_A_FIXATION);
-  levers[ROUTE_A_RECALL].attach(PIN_LOCK_ROUTE_A_RECALL);
+  levers[ROUTE_AP_FIXATION].attach(PIN_BUTTON_ROUTE_AP_FIXATION);
+  levers[ROUTE_AP_RECALL].attach(PIN_LOCK_ROUTE_AP_RECALL);
 
   for (int number = 0; number < ARRAY_SIZE; number++) {
     levers[number].interval(200);
   }
   // Special case: route fixation button should take some seconds to activate.
-  levers[ROUTE_A_FIXATION].interval(2000);
+  levers[ROUTE_AP_FIXATION].interval(2000);
 
   // look up the initial lever positions and update accordingly.
   for (int number = 0; number < ARRAY_SIZE; number++) {
@@ -392,15 +394,15 @@ void loop() {
   update_single_lever_led(PIN_LED_SWITCHING_PERMISSION, SWITCHING_PERMISSION);
 
   update_dual_lever_led(PIN_LED_ROUTE_A, ROUTE_A1, ROUTE_A2);
-  update_dual_lever_led(PIN_LED_ROUTE_BERENBACH, ROUTE_BERENBACH1, ROUTE_BERENBACH2);
+  update_dual_lever_led(PIN_LED_ROUTE_P, ROUTE_P1, ROUTE_P2);
 
-  if (current_position[ROUTE_A_FIXATION] == PLUS) {
-    digitalWrite(PIN_LED_ROUTE_A_FIXATION, LOW);
-    digitalWrite(PIN_LED_ROUTE_A_RECALL, LOW);
+  if (current_position[ROUTE_AP_FIXATION] == PLUS) {
+    digitalWrite(PIN_LED_ROUTE_AP_FIXATION, LOW);
+    digitalWrite(PIN_LED_ROUTE_AP_RECALL, LOW);
   }
   else {
-    digitalWrite(PIN_LED_ROUTE_A_FIXATION, HIGH);
-    digitalWrite(PIN_LED_ROUTE_A_RECALL, HIGH);
+    digitalWrite(PIN_LED_ROUTE_AP_FIXATION, HIGH);
+    digitalWrite(PIN_LED_ROUTE_AP_RECALL, HIGH);
   }
 
   // TODO: update the outgoing pins.
