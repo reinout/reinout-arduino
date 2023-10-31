@@ -6,7 +6,9 @@ ideally a waiting period before it "arms" again.
 
 ```mermaid
 stateDiagram-v2
-    Off --> Active direction Mayen: button pressed in station building
-	Active direction Mayen --> Occupied direction Mayen: Detector A becomes active
+    m1: Active direction Mayen
+    m2: Occupied direction Mayen
+    Off --> m1: button pressed in station building
+    m1 --> m2: Detector A becomes active
 
 ```
