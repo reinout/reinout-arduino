@@ -1,4 +1,3 @@
-BASE_DIR = $(HOME)/zelf/arduino
 USB = /dev/cu.usbserial-11110
 BOARD = arduino:avr:uno
 

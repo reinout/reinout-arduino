@@ -17,56 +17,28 @@ those'll be in separate repositories to make cloning/sharing/using them easier.
 
 ## OSX prerequisites
 
-I'm building this all on OSX. What I used to get it all running is mostly from the
-[installation instructions of the
-bare-arduino-project](https://github.com/ladislas/Bare-Arduino-Project/blob/master/INSTALL.md):
+In 2024, life is much easier than ten years ago. The USB connector is supported out of
+the box. No more strange driver from a chinese website. And.... there's `arduino-cli`!
 
-    $ brew tap sudar/arduino-mk
-    $ brew install arduino-mk
+So the prerequisites are installing the regular arduino IDE (2.something at the moment)
+and brew-installing `arduino-cli`. Then mostly follow the getting started documentation
+of https://arduino.github.io/arduino-cli/ (0.35 at the moment).
 
-At the end, the brew install says:
+- Grab board name from `arduino-cli board listall`. In my case `arduino:avr:uno` for the
+  uno.
 
-    To use the Arduino-Makefile, please add the following into your per-project Makefile
+- `arduino-cli board list` to grab the port
 
-    include /opt/homebrew/opt/arduino-mk/Arduino.mk
+Install libraries:
 
+    arduino-cli lib install Bounce2
 
-## New install
-
-Regular venv/pip:
-
-    $ python3 -m venv venv
-    $ venv/bin/pip install -r requirements.txt
+And I made a symlink to my local checkout of https://github.com/reinout/servomover into
+`~/Documents/Arduino/libraries/`.
 
 
+## Makefile setup
 
+A `base.mk` provides most of the needed compile/upload functionality.
 
-## Old info
-
-
-
-
-The also-needed pyserial is a dependency in my ``setup.py``, so that's
-installed automatically by buildout.
-
-By buildout? Yes, I'm using buildout instead of virtualenv/pip so that I can
-use some of the automation I'm used to (like automatic sphinx documentation
-setup). Nobody else but me will need that part, so just make sure you're
-pip-installing the current directory as all my dependencies are neatly in the
-``setup.py``, of course :-)
-
-
-
-
-## CLI
-
-Grab board name from `arduino-cli board listall`. In my case `arduino:avr:uno` for the
-uno.
-
-`arduino-cli core install arduino:avr`
-
-`arduino-cli board list` to grab the port
-
-`arduino-cli compile --fqbn arduino:avr:uno voorbeeld/voorbeeld.ino`
-
-`arduino-cli upload -p /dev/cu.usbserial-11110 --fqbn arduino:avr:uno voorbeeld/`
+A `Makefile` per dir just has to include it and perhaps add a `BOARD` variable.
