@@ -1,9 +1,14 @@
 Changelog of reinout-arduino
 ===================================================
 
-
-0.5 (unreleased)
+0.6 (unreleased)
 ----------------
+
+- Started mostly anew now that arduino-cli made our lives much easier!
+
+
+0.5 (somewhere in 2016)
+-----------------------
 
 - Started with 'Kelberg' signalbox (arduino mega) project.
 

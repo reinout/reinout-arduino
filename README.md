@@ -54,3 +54,19 @@ use some of the automation I'm used to (like automatic sphinx documentation
 setup). Nobody else but me will need that part, so just make sure you're
 pip-installing the current directory as all my dependencies are neatly in the
 ``setup.py``, of course :-)
+
+
+
+
+## CLI
+
+Grab board name from `arduino-cli board listall`. In my case `arduino:avr:uno` for the
+uno.
+
+`arduino-cli core install arduino:avr`
+
+`arduino-cli board list` to grab the port
+
+`arduino-cli compile --fqbn arduino:avr:uno voorbeeld/voorbeeld.ino`
+
+`arduino-cli upload -p /dev/cu.usbserial-11110 --fqbn arduino:avr:uno voorbeeld/`
