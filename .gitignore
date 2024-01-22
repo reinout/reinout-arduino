@@ -43,3 +43,4 @@ etc/*.logrotate
 local*settings*.py
 
 lib/
+/venv/
