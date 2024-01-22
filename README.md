@@ -43,3 +43,8 @@ And I made a symlink to my local checkout of https://github.com/reinout/servomov
 A `base.mk` provides most of the needed compile/upload functionality.
 
 A `Makefile` per dir just has to include it and perhaps add a `BOARD` variable.
+
+
+## TODO
+
+Serial log output.
