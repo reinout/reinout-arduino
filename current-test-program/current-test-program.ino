@@ -16,7 +16,7 @@ void setup() {
 
 void loop() {
     ir_sensor.update();
-    if (ir_sensor.fell())
+    if (ir_sensor.fell())  // fell: iets gedetecteerd, naar 0.
     {
     digitalWrite(LED_BUILTIN, HIGH);
     digitalWrite(RELAIS, LOW);
