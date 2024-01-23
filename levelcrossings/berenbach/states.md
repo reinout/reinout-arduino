@@ -11,13 +11,20 @@ ideally a waiting period before it "arms" again.
 stateDiagram-v2
     m1: Active direction Mayen
     m2: Occupied direction Mayen
-	m3: Off, awaiting release by detector B
+    m3a: Occupied direction Mayen, B has armed
+    m3b: Off, awaiting arming of B
+	m3c: Off, awaiting release by detector B
     b1: Active direction Berenbach
     b2: Occupied direction Berenbach
+
     Off --> m1: button pressed in station building
     m1 --> m2: Detector A becomes active
-	m2 --> m3: Detector A becomes inactive
-	m3 --> Off: Detector B becomes inactive
+	m2 --> m3a: Detector B becomes active
+    m3a --> m3c: Detector A becomes inactive
+	m2 --> m3b: Detector A becomes inactive
+    m3b --> m3c: Dector B becomes active
+	m3c --> Off: Detector B becomes inactive
+
 	Off --> b1: Detector B becomes active
 	b1 --> b2: Detector A becomes active
 	b2 --> Off: Detector A becomes inactive

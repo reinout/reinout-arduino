@@ -13,6 +13,9 @@ upload: compile
 clean:
 	rm -f .compilemarker
 
+# test is just a dummy so that I can do easy "ctrl-c t" with my emacs setup to
+# test/upload stuff....
+test: upload
 
 
 .compilemarker: *.ino
