@@ -34,17 +34,22 @@ stateDiagram-v2
 Pseudocode for the main loop:
 
 ```python
-# Handle events
-if 'detector A becomes active' and state==off:
-    state = m1
-if 'detector A becomes inactive' and state==m1:
-    state = m2
-if ...
+# Per state, look at which transition is possible (and ignore the rest)
+if state == off:
+    # Two actions are possible, "off --> b1"  and "off -> m1".
+    if sensor_b == active:
+        state = b1
+    if button_in_station_building == pressed:
+        state = m1
 
-# Handle state
-if state in [m1, m2, b1, b2]:
-    overweg == aan
+if state == b1:
+    if sensor_a == active:
+        state = b2
+# etc etc etc
+
+# Once the state is known, activate/deactivate the level crossing.
+if state in [off, m3b, m3c]:
+    level_crossing = blinking
 else:
-    overweg == uit
-
+    level_crossing = quiet
 ```
