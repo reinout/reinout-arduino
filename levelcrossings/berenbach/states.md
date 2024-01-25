@@ -48,18 +48,3 @@ else:
     overweg == uit
 
 ```
-
-Potential LED lights:
-
-- Overweg aan/uit
-- Naar M
-  - m1: aan
-  - m2: knipper
-  - m3: 30%
-- Naar B:
-  - b1: aan
-  - b2: knipper
-- Detector A en B (2x)
-  - Actieve detectie: 100%
-  - Aan: 70%
-  - Arming period: 30%
