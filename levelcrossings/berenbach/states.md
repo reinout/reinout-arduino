@@ -22,7 +22,7 @@ stateDiagram-v2
 	m2 --> m3a: Detector B becomes active
     m3a --> m3c: Detector A becomes inactive
 	m2 --> m3b: Detector A becomes inactive
-    m3b --> m3c: Dector B becomes active
+    m3b --> m3c: Detector B becomes active
 	m3c --> Off: Detector B becomes inactive
 
 	Off --> b1: Detector B becomes active
