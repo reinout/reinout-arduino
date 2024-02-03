@@ -19,7 +19,7 @@ clean:
 test: upload
 
 
-.compilemarker: *.ino
+.compilemarker: *.ino *.h *.cpp
 	# Assumption: there is only one .ino file per directory
 	arduino-cli compile --fqbn ${BOARD} *.ino
 	touch .compilemarker
