@@ -47,6 +47,9 @@ void loop() {
       if (push_button.fell()){
         // fell: iets gedetecteerd, naar 0.
         state = STATE_M1;
+        // Direction Mayen, so we can deactivate quickly after passing
+        // the level crossing.
+        ir_sensor_a.enable_quick_deactivation();
       }
     }
 

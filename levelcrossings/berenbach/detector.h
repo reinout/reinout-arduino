@@ -11,12 +11,14 @@ class Detector
   Detector(int pin);
   void init();
   void update();
+  void enable_quick_deactivation();
   bool active;
 
  private:
   int pin;
   bool deactivating;
   unsigned long deactivate_after;
+  unsigned long deactivation_timeout;
   Bounce ir_sensor;
 };
 
