@@ -11,6 +11,10 @@ compile: .compilemarker
 upload: compile
 	arduino-cli upload -p ${USB} --fqbn ${BOARD}
 
+monitor: upload
+	arduino-cli monitor -p ${USB} --fqbn ${BOARD}
+
+
 clean:
 	rm -f .compilemarker
 
@@ -19,7 +23,7 @@ clean:
 test: upload
 
 
-.compilemarker: *.ino *.h *.cpp
+.compilemarker: *.ino $(wildcard *.h) $(wildcard*.cpp)
 	# Assumption: there is only one .ino file per directory
 	arduino-cli compile --fqbn ${BOARD} *.ino
 	touch .compilemarker
