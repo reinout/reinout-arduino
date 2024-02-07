@@ -24,6 +24,7 @@ int state;
 
 
 void setup() {
+    Serial.begin(9600);
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(RELAIS, HIGH);
     pinMode(RELAIS, OUTPUT);
@@ -39,14 +40,23 @@ void loop() {
     ir_sensor_b.update();
     push_button.update();
 
+    if (push_button.fell()) {
+      Serial.println("FELL");
+    }
+    if (push_button.rose()) {
+      Serial.println("ROSE");
+    }
+
     // Per state, look what transition is possible.
     if (state == STATE_REST){
       if (ir_sensor_b.active == true) {
         state = STATE_B1;
+        Serial.println("State: b1");
       }
       if (push_button.fell()){
         // fell: iets gedetecteerd, naar 0.
         state = STATE_M1;
+        Serial.println("State: m1, push button was pushed");
         // Direction Mayen, so we can deactivate quickly after passing
         // the level crossing.
         ir_sensor_a.enable_quick_deactivation();
@@ -56,45 +66,53 @@ void loop() {
     if (state == STATE_M1){
       if (ir_sensor_a.active == true) {
         state = STATE_M2;
+        Serial.println("State: m2");
       }
     }
 
     if (state == STATE_M2){
       if (ir_sensor_b.active == true) {
         state = STATE_M3A;
+        Serial.println("State: m3a");
       }
       if (ir_sensor_a.active == false) {
         state = STATE_M3B;
+        Serial.println("State: m3b");
       }
     }
 
     if (state == STATE_M3A){
       if (ir_sensor_a.active == false) {
         state = STATE_M3C;
+        Serial.println("State: m3a");
       }
     }
 
     if (state == STATE_M3B){
       if (ir_sensor_b.active == true) {
         state = STATE_M3C;
+        Serial.println("State: m3c");
       }
     }
 
     if (state == STATE_M3C){
       if (ir_sensor_b.active == false) {
         state = STATE_REST;
+        Serial.println("State: rest");
       }
     }
 
     if (state == STATE_B1){
       if (ir_sensor_a.active == true) {
         state = STATE_B2;
+        Serial.println("State: b2");
       }
     }
 
     if (state == STATE_B2){
       if (ir_sensor_a.active == false) {
         state = STATE_REST;
+        Serial.println("State: rest");
       }
     }
 
