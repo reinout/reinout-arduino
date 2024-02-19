@@ -117,12 +117,18 @@ void loop() {
     }
 
     // Handle the state.
+    // Three state should have the relais high (=level crossing is off).
     if ((state == STATE_REST) || (state == STATE_M3B) || (state == STATE_M3C)) {
       digitalWrite(RELAIS, HIGH);
-      digitalWrite(LED_BUILTIN, LOW);
     }
     else {
       digitalWrite(RELAIS, LOW);
+    }
+    // Use the LED to signal that the state is in REST.
+    if (state == STATE_REST) {
+      digitalWrite(LED_BUILTIN, LOW);
+    }
+    else {
       digitalWrite(LED_BUILTIN, HIGH);
     }
 
