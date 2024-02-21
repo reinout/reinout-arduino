@@ -10,7 +10,7 @@ class Detector
  public:
   Detector(int pin);
   void init();
-  void update();
+  int update();
   void enable_quick_deactivation();
   bool active;
 
