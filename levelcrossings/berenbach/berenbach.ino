@@ -2,9 +2,9 @@
 #include "./detector.h"
 
 int RELAIS = 4;
-int IR_SENSOR_PIN_B = 5;
-int IR_SENSOR_PIN_A = 6;
-int PUSH_BUTTON_PIN = 7;
+int IR_SENSOR_PIN_B = 5;  // 5
+int IR_SENSOR_PIN_A = 6;  // 6
+int PUSH_BUTTON_PIN = 7;  // 7
 
 Detector ir_sensor_a = Detector(IR_SENSOR_PIN_A);
 Detector ir_sensor_b = Detector(IR_SENSOR_PIN_B);
@@ -41,10 +41,10 @@ void loop() {
     push_button.update();
 
     if (push_button.fell()) {
-      Serial.println("FELL");
+      Serial.println("button FELL");
     }
     if (push_button.rose()) {
-      Serial.println("ROSE");
+      Serial.println("button ROSE");
     }
 
     // Per state, look what transition is possible.
