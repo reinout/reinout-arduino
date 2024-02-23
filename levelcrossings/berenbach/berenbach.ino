@@ -148,7 +148,7 @@ void loop() {
     }
 
     // Handle the state.
-    // Three state should have the relais high (=level crossing is off).
+    // Three states should have the relais high (=level crossing is off).
     if ((state == STATE_REST) || (state == STATE_M3B) || (state == STATE_M3C)) {
       digitalWrite(RELAIS, HIGH);
     }
