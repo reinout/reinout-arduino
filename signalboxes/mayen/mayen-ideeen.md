@@ -66,3 +66,8 @@ Dan wordt het:
 - 11 voor display.
 
 54 totaal. Precies wat er aan digitale pins is :-)
+
+
+## Relais om de servo's pas na initialisatie van stroom te voorzien
+
+http://moba.noethlich.info/?page_id=333
