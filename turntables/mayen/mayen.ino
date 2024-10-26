@@ -6,12 +6,13 @@
 
 #include <AccelStepper.h>
 #include <Bounce2.h>
+#include <Keypad.h>
 
 // Pins
-int ENABLE_PIN = 3;
-int DIR_PIN = 4;
-int STEP_PIN = 5;
-int END_STOP_PIN = 7;
+int ENABLE_PIN = 2;
+int DIR_PIN = 3;
+int STEP_PIN = 4;
+int END_STOP_PIN = 5;
 
 // Handy constants
 long PHYSICAL_STEPS_PER_ROTATION = 200;
@@ -24,6 +25,19 @@ Bounce end_stop = Bounce();
 
 // States
 boolean am_homing = true;
+
+// Keypad
+const byte ROWS = 4;
+const byte COLS = 4;
+char hexaKeys[ROWS][COLS] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+byte rowPins[ROWS] = {13, 12, 11, 10};
+byte colPins[COLS] = {9, 8, 7, 6};
+Keypad the_keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 
 void enable_motor() {
@@ -51,22 +65,41 @@ void configure_zero_point() {
   motor.moveTo(-10);
 }
 
+void handle_key(char key) {
+  if (key == '1') {
+    motor.moveTo(-20);
+    enable_motor();
+  }
+  if (key == '2') {
+    motor.moveTo(-0.5 * STEPS_PER_ROTATION);
+    enable_motor();
+  }
+  if (key == '3') {
+    motor.moveTo(-1 * STEPS_PER_ROTATION);
+    enable_motor();
+  }
+}
+
 void setup() {
   pinMode(ENABLE_PIN, OUTPUT);
   end_stop.attach(END_STOP_PIN, INPUT_PULLUP);
   end_stop.interval(1);
   configure_motor_for_homing();
-  motor.moveTo(STEPS_PER_ROTATION * 1);
+  motor.moveTo(STEPS_PER_ROTATION * 4);
   enable_motor();
 }
 
 void loop() {
   end_stop.update();
+  char keypad_key = the_keypad.getKey();
   if (am_homing and end_stop.fell())
     {
       configure_zero_point();
-      // Temp hack
-      motor.moveTo(STEPS_PER_ROTATION * -10);
+    }
+
+  if (not am_homing and keypad_key)
+    {
+      handle_key(keypad_key);
     }
 
   if (motor.distanceToGo() == 0)
