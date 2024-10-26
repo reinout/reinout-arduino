@@ -1,6 +1,7 @@
 # USB = /dev/cu.usbserial-11110
 # USB = /dev/cu.usbserial-110
-USB = /dev/cu.usbserial-210
+# USB = /dev/cu.usbserial-210
+USB = /dev/cu.usbserial-2110
 BOARD = arduino:avr:uno
 
 info:

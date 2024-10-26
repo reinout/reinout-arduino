@@ -33,6 +33,7 @@ Install libraries:
 
     $ arduino-cli lib install Bounce2
     $ arduino-cli lib install Servo
+    $ arduino-cli lib install AccelStepper
 
 And I made a symlink to my local checkout of https://github.com/reinout/servomover into
 `~/Documents/Arduino/libraries/`.
