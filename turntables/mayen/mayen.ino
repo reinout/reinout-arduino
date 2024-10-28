@@ -49,6 +49,8 @@ void disable_motor() {
 }
 
 void configure_motor_for_homing() {
+  // Waarschijnlijk niet nodig, behalve als snelheid groter is dan normaal.
+  // De .setCurrentPosition() zet de snelheid gelijk op nul.
   motor.setMaxSpeed(1000);
   motor.setAcceleration(99999);
 }
@@ -70,11 +72,11 @@ void handle_key(char key) {
     motor.moveTo(-20);
     enable_motor();
   }
-  if (key == '2') {
+  else if (key == '2') {
     motor.moveTo(-0.5 * STEPS_PER_ROTATION);
     enable_motor();
   }
-  if (key == '3') {
+  else if (key == '3') {
     motor.moveTo(-1 * STEPS_PER_ROTATION);
     enable_motor();
   }
