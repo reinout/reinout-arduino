@@ -1,7 +1,5 @@
-/*
- *   Basic example code for controlling a stepper with the AccelStepper library
- *
- *   by Dejan, https://howtomechatronics.com
+/* Originally based om some AccelStepper example code
+   by Dejan, https://howtomechatronics.com
  */
 
 #include <AccelStepper.h>
@@ -68,7 +66,11 @@ void configure_zero_point() {
 }
 
 void handle_key(char key) {
-  if (key == '1') {
+  if (key == '0') {
+    motor.moveTo(0);
+    enable_motor();
+  }
+  else if (key == '1') {
     motor.moveTo(-20);
     enable_motor();
   }
@@ -80,14 +82,33 @@ void handle_key(char key) {
     motor.moveTo(-1 * STEPS_PER_ROTATION);
     enable_motor();
   }
+  else if (key == '5') {
+    motor.moveTo(0.5 * STEPS_PER_ROTATION);
+    enable_motor();
+  }
+  else if (key == '6') {
+    motor.moveTo(1 * STEPS_PER_ROTATION);
+    enable_motor();
+  }
+  else if (key == '8') {
+    motor.move(4 * STEPS_PER_ROTATION);
+    enable_motor();
+  }
+  else if (key == '9') {
+    motor.move(-4 * STEPS_PER_ROTATION);
+    enable_motor();
+  }
 }
+// Idea: use * and # to move x revolutions forward/backward + print the current location?
+
 
 void setup() {
   pinMode(ENABLE_PIN, OUTPUT);
+  // TODO: setEnablePin()
   end_stop.attach(END_STOP_PIN, INPUT_PULLUP);
   end_stop.interval(1);
   configure_motor_for_homing();
-  motor.moveTo(STEPS_PER_ROTATION * 4);
+  motor.moveTo(-1 * STEPS_PER_ROTATION * 4);
   enable_motor();
 }
 
@@ -107,6 +128,7 @@ void loop() {
   if (motor.distanceToGo() == 0)
     {
       disable_motor();
+      // TODO: print current location?
     }
   motor.run();
 }
