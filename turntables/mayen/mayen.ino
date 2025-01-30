@@ -7,10 +7,10 @@
 #include <Keypad.h>
 
 // Pins
-int ENABLE_PIN = 2;
-int DIR_PIN = 3;
-int STEP_PIN = 4;
-int END_STOP_PIN = 5;
+int ENABLE_PIN = 15;
+int DIR_PIN = 14;
+int STEP_PIN = 2;
+int END_STOP_PIN = 3;
 
 // Handy constants
 long PHYSICAL_STEPS_PER_ROTATION = 200;
@@ -23,6 +23,7 @@ Bounce end_stop = Bounce();
 
 // States
 boolean am_homing = true;
+boolean am_enabled = true;
 
 // Keypad
 const byte ROWS = 4;
@@ -39,11 +40,20 @@ Keypad the_keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 
 void enable_motor() {
-  digitalWrite(ENABLE_PIN, LOW);
+  if (am_enabled == false) {
+    am_enabled = true;
+    digitalWrite(ENABLE_PIN, LOW);
+    Serial.print("Enabled the motor.");
+  }
 }
 
 void disable_motor() {
-  digitalWrite(ENABLE_PIN, HIGH);
+  if (am_enabled == true) {
+    am_enabled = false;
+    digitalWrite(ENABLE_PIN, HIGH);
+    Serial.print("Disabled the motor. Current position: ");
+    Serial.println(motor.currentPosition());
+  }
 }
 
 void configure_motor_for_homing() {
@@ -61,55 +71,71 @@ void configure_motor_for_operation() {
 void configure_zero_point() {
   motor.setCurrentPosition(0);
   am_homing = false;
+  Serial.println("End stop reached: configuring zero point.");
   configure_motor_for_operation();
-  motor.moveTo(-10);
+  new_position(-10);
+}
+
+void new_position(long absolute) {
+  enable_motor();
+  Serial.print("Moving from ");
+  Serial.print(motor.currentPosition());
+  Serial.print(" to ");
+  Serial.println(absolute);
+  motor.moveTo(absolute);
+}
+
+void new_relative_position(long relative) {
+  enable_motor();
+  Serial.print("Moving from ");
+  Serial.print(motor.currentPosition());
+  Serial.print(" with relative ");
+  Serial.println(relative);
+  motor.move(relative);
 }
 
 void handle_key(char key) {
+  Serial.print("Handling key: ");
+  Serial.println(key);
   if (key == '0') {
-    motor.moveTo(0);
-    enable_motor();
+    new_position(0);
   }
   else if (key == '1') {
-    motor.moveTo(-20);
-    enable_motor();
+    new_position(-20);
   }
   else if (key == '2') {
-    motor.moveTo(-0.5 * STEPS_PER_ROTATION);
-    enable_motor();
+    new_position(-0.5 * STEPS_PER_ROTATION);
   }
   else if (key == '3') {
-    motor.moveTo(-1 * STEPS_PER_ROTATION);
-    enable_motor();
+    new_position(-1 * STEPS_PER_ROTATION);
   }
   else if (key == '5') {
-    motor.moveTo(0.5 * STEPS_PER_ROTATION);
-    enable_motor();
+    new_position(0.5 * STEPS_PER_ROTATION);
   }
   else if (key == '6') {
-    motor.moveTo(1 * STEPS_PER_ROTATION);
-    enable_motor();
+    new_position(1 * STEPS_PER_ROTATION);
   }
   else if (key == '8') {
-    motor.move(4 * STEPS_PER_ROTATION);
-    enable_motor();
+    new_relative_position(4 * STEPS_PER_ROTATION);
   }
   else if (key == '9') {
-    motor.move(-4 * STEPS_PER_ROTATION);
-    enable_motor();
+    new_relative_position(-4 * STEPS_PER_ROTATION);
   }
 }
 // Idea: use * and # to move x revolutions forward/backward + print the current location?
 
 
 void setup() {
+  Serial.begin(9600);
   pinMode(ENABLE_PIN, OUTPUT);
+  pinMode(STEP_PIN, OUTPUT);
+  pinMode(DIR_PIN, OUTPUT);
   // TODO: setEnablePin()
   end_stop.attach(END_STOP_PIN, INPUT_PULLUP);
   end_stop.interval(1);
-  configure_motor_for_homing();
-  motor.moveTo(-1 * STEPS_PER_ROTATION * 4);
   enable_motor();
+  configure_motor_for_homing();
+  new_relative_position(-1 * STEPS_PER_ROTATION * 4);
 }
 
 void loop() {
@@ -125,10 +151,9 @@ void loop() {
       handle_key(keypad_key);
     }
 
-  if (motor.distanceToGo() == 0)
+  if (motor.distanceToGo() == 0 and am_enabled)
     {
       disable_motor();
-      // TODO: print current location?
     }
   motor.run();
 }
