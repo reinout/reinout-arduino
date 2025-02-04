@@ -13,7 +13,7 @@ int STEP_PIN = 15;  // TODO
 int END_STOP_PIN = 3;
 
 // Direction 'DIRECTION' is turning away from the zero point.
-long DIRECTION = 1;  // 1 or -1, swap value depending on motor/turntable config.
+long DIRECTION = -1;  // 1 or -1, swap value depending on motor/turntable config.
 
 // Handy constants
 long PHYSICAL_STEPS_PER_ROTATION = 200;
@@ -25,8 +25,23 @@ AccelStepper motor(1, STEP_PIN, DIR_PIN); // (Type of driver: with 2 pins, STEP,
 Bounce end_stop = Bounce();
 
 // States
-boolean am_homing = true;
+boolean am_pre_homing = true;
+boolean am_homing = false;
 boolean am_enabled = false;
+
+// Positions
+long POS0 = 1000;  // Starting position
+long POS1 = 1000;
+long POS2 = 1000;
+long POS3 = 1000;
+long POS4 = 1000;
+long POS5 = 2800;
+long POS6 = 2400;
+long POS7 = 4100;
+long POS8 = 2950;
+long POS9 = 1850;
+long POSa = 1020;
+long POSb = 20;
 
 // Keypad
 const byte ROWS = 4;
@@ -62,8 +77,8 @@ void disable_motor() {
 void configure_motor_for_homing() {
   // Waarschijnlijk niet nodig, behalve als snelheid groter is dan normaal.
   // De .setCurrentPosition() zet de snelheid gelijk op nul.
-  motor.setMaxSpeed(1000);
-  motor.setAcceleration(800);
+  motor.setMaxSpeed(500);
+  motor.setAcceleration(99999);
 }
 
 void configure_motor_for_operation() {
@@ -75,57 +90,77 @@ void configure_zero_point() {
   motor.setCurrentPosition(0);
   am_homing = false;
   Serial.println("End stop reached: configuring zero point.");
+  motor.moveTo(0);  // For completeness.
   configure_motor_for_operation();
-  new_position(DIRECTION * 10);
+  new_position(POS0);
 }
 
 void new_position(long absolute) {
+  long target = DIRECTION * absolute;
   enable_motor();
   Serial.print("Moving from ");
   Serial.print(motor.currentPosition());
   Serial.print(" to ");
-  Serial.println(absolute);
-  motor.moveTo(absolute);
+  Serial.println(target);
+  motor.moveTo(target);
 }
 
 void new_relative_position(long relative) {
+  long target = DIRECTION * relative;
   enable_motor();
   Serial.print("Moving from ");
   Serial.print(motor.currentPosition());
   Serial.print(" with relative ");
-  Serial.println(relative);
-  motor.move(relative);
+  Serial.println(target);
+  motor.move(target);
 }
 
 void handle_key(char key) {
   Serial.print("Handling key: ");
   Serial.println(key);
   if (key == '0') {
-    new_position(0);
+    new_position(POS0);
   }
   else if (key == '1') {
-    new_position(DIRECTION * 20);
+    new_position(POS1);
   }
   else if (key == '2') {
-    new_position(DIRECTION * 0.5 * STEPS_PER_ROTATION);
+    new_position(POS2);
   }
   else if (key == '3') {
-    new_position(DIRECTION * 1 * STEPS_PER_ROTATION);
+    new_position(POS3);
+  }
+  else if (key == '4') {
+    new_position(POS4);
   }
   else if (key == '5') {
-    new_position(DIRECTION * 5 * STEPS_PER_ROTATION);
+    new_position(POS5);
   }
   else if (key == '6') {
-    new_position(DIRECTION * 6 * STEPS_PER_ROTATION);
+    new_position(POS6);
+  }
+  else if (key == '7') {
+    new_position(POS7);
   }
   else if (key == '8') {
-    new_relative_position(DIRECTION * 4 * STEPS_PER_ROTATION);
+    new_position(POS8);
   }
   else if (key == '9') {
-    new_relative_position(-1 * DIRECTION * 4 * STEPS_PER_ROTATION);
+    new_position(POS9);
+  }
+  else if (key == 'A') {
+    new_position(POSa);
+  }
+  else if (key == 'B') {
+    new_position(POSb);
+  }
+  else if (key == '*') {
+    new_relative_position(-1000);
+  }
+  else if (key == '#') {
+    new_relative_position(1000);
   }
 }
-// Idea: use * and # to move x revolutions forward/backward + print the current location?
 
 
 void setup() {
@@ -138,12 +173,17 @@ void setup() {
   end_stop.interval(1);
   enable_motor();
   configure_motor_for_homing();
-  new_relative_position(-1 * DIRECTION * STEPS_PER_ROTATION * 12);
+  new_relative_position(STEPS_PER_ROTATION * 1);
 }
 
 void loop() {
   end_stop.update();
   char keypad_key = the_keypad.getKey();
+  if (am_pre_homing and motor.distanceToGo() == 0) {
+    am_pre_homing = false;
+    am_homing = true;
+    new_relative_position(STEPS_PER_ROTATION * -12);
+  }
   if (am_homing and end_stop.fell())
     {
       configure_zero_point();
