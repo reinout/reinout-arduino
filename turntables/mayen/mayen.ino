@@ -7,10 +7,13 @@
 #include <Keypad.h>
 
 // Pins
-int ENABLE_PIN = 15;
-int DIR_PIN = 14;
-int STEP_PIN = 2;
+int SLEEP_PIN = 16;  // ENABLE
+int DIR_PIN = 14;  // TODO
+int STEP_PIN = 15;  // TODO
 int END_STOP_PIN = 3;
+
+// Direction 'DIRECTION' is turning away from the zero point.
+long DIRECTION = 1;  // 1 or -1, swap value depending on motor/turntable config.
 
 // Handy constants
 long PHYSICAL_STEPS_PER_ROTATION = 200;
@@ -23,7 +26,7 @@ Bounce end_stop = Bounce();
 
 // States
 boolean am_homing = true;
-boolean am_enabled = true;
+boolean am_enabled = false;
 
 // Keypad
 const byte ROWS = 4;
@@ -42,7 +45,7 @@ Keypad the_keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 void enable_motor() {
   if (am_enabled == false) {
     am_enabled = true;
-    digitalWrite(ENABLE_PIN, LOW);
+    digitalWrite(SLEEP_PIN, HIGH);
     Serial.print("Enabled the motor.");
   }
 }
@@ -50,7 +53,7 @@ void enable_motor() {
 void disable_motor() {
   if (am_enabled == true) {
     am_enabled = false;
-    digitalWrite(ENABLE_PIN, HIGH);
+    digitalWrite(SLEEP_PIN, LOW);
     Serial.print("Disabled the motor. Current position: ");
     Serial.println(motor.currentPosition());
   }
@@ -60,7 +63,7 @@ void configure_motor_for_homing() {
   // Waarschijnlijk niet nodig, behalve als snelheid groter is dan normaal.
   // De .setCurrentPosition() zet de snelheid gelijk op nul.
   motor.setMaxSpeed(1000);
-  motor.setAcceleration(99999);
+  motor.setAcceleration(800);
 }
 
 void configure_motor_for_operation() {
@@ -73,7 +76,7 @@ void configure_zero_point() {
   am_homing = false;
   Serial.println("End stop reached: configuring zero point.");
   configure_motor_for_operation();
-  new_position(-10);
+  new_position(DIRECTION * 10);
 }
 
 void new_position(long absolute) {
@@ -101,25 +104,25 @@ void handle_key(char key) {
     new_position(0);
   }
   else if (key == '1') {
-    new_position(-20);
+    new_position(DIRECTION * 20);
   }
   else if (key == '2') {
-    new_position(-0.5 * STEPS_PER_ROTATION);
+    new_position(DIRECTION * 0.5 * STEPS_PER_ROTATION);
   }
   else if (key == '3') {
-    new_position(-1 * STEPS_PER_ROTATION);
+    new_position(DIRECTION * 1 * STEPS_PER_ROTATION);
   }
   else if (key == '5') {
-    new_position(0.5 * STEPS_PER_ROTATION);
+    new_position(DIRECTION * 5 * STEPS_PER_ROTATION);
   }
   else if (key == '6') {
-    new_position(1 * STEPS_PER_ROTATION);
+    new_position(DIRECTION * 6 * STEPS_PER_ROTATION);
   }
   else if (key == '8') {
-    new_relative_position(4 * STEPS_PER_ROTATION);
+    new_relative_position(DIRECTION * 4 * STEPS_PER_ROTATION);
   }
   else if (key == '9') {
-    new_relative_position(-4 * STEPS_PER_ROTATION);
+    new_relative_position(-1 * DIRECTION * 4 * STEPS_PER_ROTATION);
   }
 }
 // Idea: use * and # to move x revolutions forward/backward + print the current location?
@@ -127,7 +130,7 @@ void handle_key(char key) {
 
 void setup() {
   Serial.begin(9600);
-  pinMode(ENABLE_PIN, OUTPUT);
+  pinMode(SLEEP_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
   // TODO: setEnablePin()
@@ -135,7 +138,7 @@ void setup() {
   end_stop.interval(1);
   enable_motor();
   configure_motor_for_homing();
-  new_relative_position(-1 * STEPS_PER_ROTATION * 4);
+  new_relative_position(-1 * DIRECTION * STEPS_PER_ROTATION * 12);
 }
 
 void loop() {
