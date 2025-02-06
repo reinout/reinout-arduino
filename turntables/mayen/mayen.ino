@@ -37,17 +37,17 @@ int state;
 
 // Positions
 long POS0 = 1000;  // Starting position
-long POS1 = 1000;
-long POS2 = 1000;
-long POS3 = 1000;
-long POS4 = 1000;
-long POS5 = 2800;
-long POS6 = 2400;
-long POS7 = 4100;
-long POS8 = 2950;
-long POS9 = 1850;
-long POSa = 1020;
-long POSb = 20;
+long POS1 = 32150;
+long POS2 = 29100;
+long POS3 = 25100;
+long POS4 = 21900;
+long POS5 = 18789;
+long POS6 = 16264;
+long POS7 = 12820;
+long POS8 = 10100;
+long POS9 = 6020;
+long POSa = 3220;
+long POSb = 380;
 
 // Keypad
 const byte ROWS = 4;
@@ -139,31 +139,38 @@ void handle_key(char key) {
   else if (key == 'B') {
     new_position(POSb);
   }
+  // Relative movement keys.
   else if (key == '*') {
-    new_relative_position(-1000);
+    new_relative_position(-4000);
   }
   else if (key == '#') {
-    new_relative_position(1000);
+    new_relative_position(4000);
+  }
+  else if (key == 'C') {
+    new_relative_position(-100);
+  }
+  else if (key == 'D') {
+    new_relative_position(100);
   }
 }
 
 void start_pre_homing() {
   // Move a bit away from the end stop.
   state = STATE_PRE_HOMING;
-  motor.setMaxSpeed(1000);
+  motor.setMaxSpeed(2000);
   new_relative_position(STEPS_PER_ROTATION * 1);
 }
 
 void start_homing() {
   // Move towards the end stop
   state = STATE_HOMING;
-  new_relative_position(STEPS_PER_ROTATION * -12);
+  new_relative_position(STEPS_PER_ROTATION * -40);
 }
 
 void start_post_homing() {
   // End stop reached, move SLOWLY away from it.
   state = STATE_POST_HOMING;
-  motor.setMaxSpeed(50);
+  motor.setMaxSpeed(500);
   new_relative_position(STEPS_PER_ROTATION * 1);
 }
 
@@ -171,8 +178,8 @@ void start_operation() {
   motor.setCurrentPosition(0);
   motor.moveTo(0);  // For completeness.
   state = STATE_OPERATIONAL;
-  motor.setMaxSpeed(1000);
-  motor.setAcceleration(400);
+  motor.setMaxSpeed(2000);
+  motor.setAcceleration(4000);
   new_position(POS0);
 }
 
