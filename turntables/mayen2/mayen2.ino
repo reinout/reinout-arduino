@@ -19,7 +19,7 @@ long DIRECTION = 1;  // 1 or -1, swap value depending on motor/turntable config.
 long PHYSICAL_STEPS_PER_ROTATION = 400;
 long MICROSTEPPING_FACTOR = 16;
 long STEPS_PER_ROTATION = PHYSICAL_STEPS_PER_ROTATION * MICROSTEPPING_FACTOR;
-long STEPS_PER_TRACK = STEPS_PER_ROTATION / 10;  // More or less, approximation...
+long STEPS_PER_TRACK = STEPS_PER_ROTATION / 20;  // More or less, approximation...
 
 // Buttons, stepper motors
 AccelStepper motor(1, STEP_PIN, DIR_PIN); // (Type of driver: with 2 pins, STEP, DIR)
@@ -38,17 +38,17 @@ int state;
 
 // Positions
 long POS0 = 100;  // Starting position
-long POS1 = 2750;
-long POS2 = 2500;
-long POS3 = 2250;
-long POS4 = 2000;
-long POS5 = 1750;
-long POS6 = 1500;
-long POS7 = 1250;
-long POS8 = 1000;
-long POS9 = 750;
-long POSa = 500;
-long POSb = 250;
+long POS1 = 2620;
+long POS2 = 2380;
+long POS3 = 2100;
+long POS4 = 1900;
+long POS5 = 1600;
+long POS6 = 1390;
+long POS7 = 1090;
+long POS8 = 880;
+long POS9 = 560;
+long POSa = 320;
+long POSb = 40;
 
 // Keypad
 const byte ROWS = 4;
@@ -179,8 +179,8 @@ void start_operation() {
   motor.setCurrentPosition(0);
   motor.moveTo(0);  // For completeness.
   state = STATE_OPERATIONAL;
-  motor.setMaxSpeed(200);
-  motor.setAcceleration(400);
+  motor.setMaxSpeed(150);
+  motor.setAcceleration(100);
   new_position(POS0);
 }
 
