@@ -241,14 +241,6 @@ void start_operation() {
   // motor.setAcceleration(99999);
 }
 
-void record_track() {
-  Serial.print("Track number ");
-  Serial.print(upcoming_track_number);
-  Serial.print(" has position ");
-  Serial.println(motor.currentPosition());
-  upcoming_track_number += 1;
-}
-
 void setup() {
   Serial.begin(9600);
   pinMode(STEP_PIN, OUTPUT);
