@@ -6,31 +6,33 @@
 #include <Bounce2.h>
 #include <Keypad.h>
 
-// Pins
-int SLEEP_PIN = 16;  // ENABLE
-int DIR_PIN = 14;  // TODO
-int STEP_PIN = 15;  // TODO
-int END_STOP_PIN = 3;
+// Pins for steering the stepper motor driver.
+int DIR_PIN = 5;
+int STEP_PIN = 4;
 
-// Direction 'DIRECTION' is turning away from the zero point.
+// Pins for reading info from the turntable tracks.
+int BEGIN_TRACK_PIN = 16;
+int OTHER_TRACK_PIN = 15;
+int END_TRACK_PIN = 14;
+
+// Direction 'DIRECTION' is turning away counterclockwise from the begin track.
 long DIRECTION = -1;  // 1 or -1, swap value depending on motor/turntable config.
 
 // Handy constants
-long PHYSICAL_STEPS_PER_ROTATION = 200;
-long MICROSTEPPING_FACTOR = 8;
+long PHYSICAL_STEPS_PER_ROTATION = 400;
+long MICROSTEPPING_FACTOR = 16;
 long STEPS_PER_ROTATION = PHYSICAL_STEPS_PER_ROTATION * MICROSTEPPING_FACTOR;
 
 // Buttons, stepper motors
 AccelStepper motor(1, STEP_PIN, DIR_PIN); // (Type of driver: with 2 pins, STEP, DIR)
-Bounce end_stop = Bounce();
-
-// Motor management
-boolean motor_enabled = false;
+Bounce begin_track = Bounce();
+Bounce other_track = Bounce();
+Bounce end_track = Bounce();
 
 // States
 int STATE_PRE_HOMING = 1;
 int STATE_HOMING = 2;
-int STATE_POST_HOMING = 3;
+int STATE_POST_HOMING = 3;g
 int STATE_OPERATIONAL = 4;
 
 int state;
@@ -63,26 +65,8 @@ byte colPins[COLS] = {9, 8, 7, 6};
 Keypad the_keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 
-void enable_motor() {
-  if (motor_enabled == false) {
-    motor_enabled = true;
-    digitalWrite(SLEEP_PIN, HIGH);
-    Serial.print("Enabled the motor.");
-  }
-}
-
-void disable_motor() {
-  if (motor_enabled == true) {
-    motor_enabled = false;
-    digitalWrite(SLEEP_PIN, LOW);
-    Serial.print("Disabled the motor. Current position: ");
-    Serial.println(motor.currentPosition());
-  }
-}
-
 void new_position(long absolute) {
   long target = DIRECTION * absolute;
-  enable_motor();
   Serial.print("Moving from ");
   Serial.print(motor.currentPosition());
   Serial.print(" to ");
@@ -92,7 +76,6 @@ void new_position(long absolute) {
 
 void new_relative_position(long relative) {
   long target = DIRECTION * relative;
-  enable_motor();
   Serial.print("Moving from ");
   Serial.print(motor.currentPosition());
   Serial.print(" with relative ");
@@ -155,23 +138,23 @@ void handle_key(char key) {
 }
 
 void start_pre_homing() {
-  // Move a bit away from the end stop.
+  // Move a bit away from the begin track.
   state = STATE_PRE_HOMING;
   motor.setMaxSpeed(2000);
   new_relative_position(STEPS_PER_ROTATION * 1);
 }
 
 void start_homing() {
-  // Move towards the end stop
+  // Move towards the begin track.
   state = STATE_HOMING;
   new_relative_position(STEPS_PER_ROTATION * -40);
 }
 
 void start_post_homing() {
-  // End stop reached, move SLOWLY away from it.
+  // Moved passed begin track, move SLOWLY back towards it until contact is made again.
   state = STATE_POST_HOMING;
   motor.setMaxSpeed(500);
-  new_relative_position(STEPS_PER_ROTATION * 1);
+  new_relative_position(STEPS_PER_ROTATION * 2);
 }
 
 void start_operation() {
@@ -180,47 +163,39 @@ void start_operation() {
   state = STATE_OPERATIONAL;
   motor.setMaxSpeed(2000);
   motor.setAcceleration(4000);
-  new_position(POS0);
 }
-
 
 void setup() {
   Serial.begin(9600);
-  pinMode(SLEEP_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
-  // TODO: setEnablePin()
-  end_stop.attach(END_STOP_PIN, INPUT_PULLUP);
-  end_stop.interval(1);
-  enable_motor();
+  begin_track.attach(BEGIN_TRACK_PIN, INPUT_PULLUP);
+  begin_track.interval(1);
+  other_track.attach(OTHER_TRACK_PIN, INPUT_PULLUP);
+  other_track.interval(1);
+  end_track.attach(END_TRACK_PIN, INPUT_PULLUP);
+  end_track.interval(1);
   motor.setAcceleration(99999);
   start_pre_homing();
 }
 
 void loop() {
-  end_stop.update();
+  begin_track.update();
+  other_track.update();
+  end_track.update();
   char keypad_key = the_keypad.getKey();
 
   if (state == STATE_PRE_HOMING and motor.distanceToGo() == 0) {
     start_homing();
   }
-  else if (state == STATE_HOMING and end_stop.fell()) {
+  else if (state == STATE_HOMING and begin_track.rose()) {
     start_post_homing();
   }
-  else if (state == STATE_POST_HOMING and end_stop.rose()) {
+  else if (state == STATE_POST_HOMING and begin_track.fell()) {
     start_operation();
   }
   else if (state == STATE_OPERATIONAL and keypad_key) {
     handle_key(keypad_key);
-  }
-
-  if (motor_enabled and motor.distanceToGo() == 0) {
-    disable_motor();
-  }
-
-  // Safety valve
-  if (state == STATE_OPERATIONAL and end_stop.fell()) {
-    start_post_homing();
   }
 
   // Regular loop.
