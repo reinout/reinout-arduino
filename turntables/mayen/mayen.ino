@@ -38,12 +38,8 @@ Bounce end_track = Bounce();
 int STATE_PRE_HOMING = 1;
 int STATE_HOMING = 2;
 int STATE_OPERATIONAL = 4;
-int STATE_DISCOVERY = 5;
 
 int state;
-
-// Track discovery
-int upcoming_track_number = 0;
 
 // Positions
 long POS0 = 0;
@@ -195,10 +191,7 @@ void handle_key(char key) {
   }  // End of 'C'
 
   if (selected_letter == 'D') {
-    if (key == '0') {
-      start_discovery();
-    }
-    else if (key == '1') {
+    if (key == '1') {
       new_relative_position(10);
     }
     else if (key == '4') {
@@ -248,11 +241,6 @@ void start_operation() {
   // motor.setAcceleration(99999);
 }
 
-void start_discovery() {
-  state = STATE_DISCOVERY;
-  new_relative_position(STEPS_PER_ROTATION * 100);
-}
-
 void record_track() {
   Serial.print("Track number ");
   Serial.print(upcoming_track_number);
@@ -290,14 +278,6 @@ void loop() {
   }
   else if (state == STATE_OPERATIONAL and keypad_key) {
     handle_key(keypad_key);
-  }
-  else if (state == STATE_DISCOVERY and other_track.fell()) {
-    record_track();
-  }
-  else if (state == STATE_DISCOVERY and end_track.fell()) {
-    record_track();
-    state = STATE_OPERATIONAL;
-    motor.moveTo(0);
   }
 
   if (motor_enabled and motor.distanceToGo() == 0) {
