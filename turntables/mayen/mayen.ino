@@ -16,8 +16,6 @@ int ENABLE_PIN = 2;
 
 // Pins for reading info from the turntable tracks.
 int BEGIN_TRACK_PIN = 16;
-int OTHER_TRACK_PIN = 15;
-int END_TRACK_PIN = 14;
 
 // Direction 'DIRECTION' is turning away counterclockwise from the begin track.
 long DIRECTION = -1;  // 1 or -1, swap value depending on motor/turntable config.
@@ -31,8 +29,6 @@ long SPEED = 4000;
 // Buttons, stepper motors
 AccelStepper motor(1, STEP_PIN, DIR_PIN); // (Type of driver: with 2 pins, STEP, DIR)
 Bounce begin_track = Bounce();
-Bounce other_track = Bounce();
-Bounce end_track = Bounce();
 
 // States
 int STATE_PRE_HOMING = 1;
@@ -45,18 +41,18 @@ int state;
 long POS0 = 0;
 long POS1 = 6769;
 long POS2 = 13127;
-long POS3 = 19616;
-long POS4 = 26042;
-long POS5 = 32271;
-long POS6 = 38760;
-long POS7 = 45166;
-long POS8 = 51511;
-long POS9 = 58121;  // fuzzy
-long POS10 = 64945;
-long POS11 = 77455;
-long POS12 = 83745;
+long POS3 = 19416;
+long POS4 = 25842;
+long POS5 = 31971;
+long POS6 = 38460;
+long POS7 = 44866;
+long POS8 = 51211;
+long POS9 = 57621;
+long POS10 = 64145;
+long POS11 = 77555;
+long POS12 = 84045;
 long POS13 = 90355;
-long POS14 = 100620;
+long POS14 = 100920;
 long POS15 = 115810;
 
 // Keypad
@@ -87,7 +83,7 @@ void disable_motor() {
     motor_enabled = false;
     digitalWrite(ENABLE_PIN, HIGH);
     Serial.print("Disabled the motor. Current position: ");
-    Serial.println(motor.currentPosition());
+    Serial.println(motor.currentPosition() * DIRECTION);
   }
 }
 
@@ -238,7 +234,7 @@ void start_operation() {
   motor.moveTo(0);  // For completeness.
   state = STATE_OPERATIONAL;
   motor.setMaxSpeed(SPEED);
-  // motor.setAcceleration(99999);
+  motor.setAcceleration(1000);
 }
 
 void setup() {
@@ -248,18 +244,12 @@ void setup() {
   pinMode(ENABLE_PIN, OUTPUT);
   begin_track.attach(BEGIN_TRACK_PIN, INPUT_PULLUP);
   begin_track.interval(1);
-  other_track.attach(OTHER_TRACK_PIN, INPUT_PULLUP);
-  other_track.interval(1);
-  end_track.attach(END_TRACK_PIN, INPUT_PULLUP);
-  end_track.interval(1);
   motor.setAcceleration(99999);
   start_pre_homing();
 }
 
 void loop() {
   begin_track.update();
-  other_track.update();
-  end_track.update();
   char keypad_key = the_keypad.getKey();
 
   if (state == STATE_PRE_HOMING and motor.distanceToGo() == 0) {
