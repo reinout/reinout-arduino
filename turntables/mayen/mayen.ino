@@ -12,7 +12,7 @@ int STEP_PIN = 3;
 
 // Motor management
 boolean motor_enabled = false;
-int ENABLE_PIN = 17;
+int ENABLE_PIN = 2;
 
 // Pins for reading info from the turntable tracks.
 int BEGIN_TRACK_PIN = 16;
