@@ -55,6 +55,11 @@ long POS13 = 90355;
 long POS14 = 100920;
 long POS15 = 115810;
 
+// "Bouncing" behaviour: move beyond position going towards begin track and then move
+// back.
+bool move_to_actual_target_after_stopping = false;
+long actual_target = 0;
+
 // Keypad
 const byte ROWS = 4;
 const byte COLS = 4;
@@ -87,14 +92,27 @@ void disable_motor() {
   }
 }
 
-void new_position(long absolute) {
-  long target = DIRECTION * absolute;
+void new_position(long target) {
+  // 'target' is in absolute positions counterclockwise to zero.
+  if ((motor.currentPosition() * DIRECTION > target) and (not target == 0)) {
+    // Move a bit further and then go back.
+    move_to_actual_target_after_stopping = true;
+    actual_target = target;
+    target = target - STEPS_PER_ROTATION / 4;
+    Serial.print("Moving first to ");
+    Serial.print(target);
+    Serial.print(", then to the actual target ");
+    Serial.printnl(actual_target);
+  }
+  else {
+    move_to_actual_target_after_stopping = false;
+  }
   Serial.print("Moving from ");
   Serial.print(motor.currentPosition());
   Serial.print(" to ");
   Serial.println(target);
   enable_motor();
-  motor.moveTo(target);
+  motor.moveTo(target * DIRECTION);
 }
 
 void new_relative_position(long relative) {
@@ -263,7 +281,12 @@ void loop() {
   }
 
   if (motor_enabled and motor.distanceToGo() == 0) {
-    disable_motor();
+    if (move_to_actual_target_after_stopping == true) {
+      new_position(actual_target);
+    }
+    else {
+      disable_motor();
+    }
   }
 
   // Regular loop.
