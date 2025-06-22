@@ -49,11 +49,11 @@ long POS7 = 44866;
 long POS8 = 51211;
 long POS9 = 57621;
 long POS10 = 64145;
-long POS11 = 77555;
-long POS12 = 84045;
-long POS13 = 90355;
-long POS14 = 100920;
-long POS15 = 115810;
+long POS_A5 = 77555;
+long POS_A4 = 84045;
+long POS_A3 = 90355;
+long POS_A2 = 100920;
+long POS_A1 = 115810;
 
 // "Bouncing" behaviour: move beyond position going towards begin track and then move
 // back.
@@ -134,19 +134,19 @@ void handle_key(char key) {
 
   if (selected_letter == 'A') {
     if (key == '5') {
-      new_position(POS11);
+      new_position(POS_A5);
     }
     else if (key == '4') {
-      new_position(POS12);
+      new_position(POS_A4);
     }
     else if (key == '3') {
-      new_position(POS13);
+      new_position(POS_A3);
     }
     else if (key == '2') {
-      new_position(POS14);
+      new_position(POS_A2);
     }
     else if (key == '1') {
-      new_position(POS15);
+      new_position(POS_A1);
     }
   }  // End of 'A'
 
