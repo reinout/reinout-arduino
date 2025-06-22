@@ -93,9 +93,8 @@ void enable_motor() {
 void disable_motor() {
   if (motor_enabled == true) {
     motor_enabled = false;
-    /* digitalWrite(ENABLE_PIN, HIGH); */
-    /* Serial.print("Disabled the motor. Current position: "); */
-    Serial.print("(Didn't actually disable the motor, btw). Current position: ");
+    digitalWrite(ENABLE_PIN, HIGH);
+    Serial.print("Disabled the motor. Current position: ");
     Serial.println(motor.currentPosition() * DIRECTION);
   }
 }
