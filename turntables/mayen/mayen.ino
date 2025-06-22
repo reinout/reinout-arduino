@@ -39,28 +39,28 @@ int state;
 
 // Positions
 long POS0 = 0;
-long POS_C9 = 6769;
+long POS_C9 = 6969;
 long POS_C8 = 13127;
-long POS_C7 = 19416;
+long POS_C7 = 19516;
 long POS_C6 = 25842;
-long POS_C5 = 31971;
-long POS_C4 = 38460;
-long POS_C3 = 44866;
-long POS_C2 = 51211;
-long POS_C1 = 57621;
+long POS_C5 = 32371;
+long POS_C4 = 38580;
+long POS_C3 = 45066;
+long POS_C2 = 51311;
+long POS_C1 = 57721;
 
-long POS_B1 = 64145;
-long POS_B2 = 57621;
-long POS_B3 = 51211;
-long POS_B4 = 44866;
-long POS_B5 = 38460;
-long POS_B6 = 31971;
+long POS_B1 = 64395;
+long POS_B2 = 58021;
+long POS_B3 = 51611;
+long POS_B4 = 45266;
+long POS_B5 = 38760;
+long POS_B6 = 32471;
 
-long POS_A5 = 77555;
+long POS_A5 = 77855;
 long POS_A4 = 84045;
-long POS_A3 = 90355;
-long POS_A2 = 100920;
-long POS_A1 = 115810;
+long POS_A3 = 90525;
+long POS_A2 = 101020;
+long POS_A1 = 115910;
 
 // "Bouncing" behaviour: move beyond position going towards begin track and then move
 // back.
@@ -93,8 +93,9 @@ void enable_motor() {
 void disable_motor() {
   if (motor_enabled == true) {
     motor_enabled = false;
-    digitalWrite(ENABLE_PIN, HIGH);
-    Serial.print("Disabled the motor. Current position: ");
+    /* digitalWrite(ENABLE_PIN, HIGH); */
+    /* Serial.print("Disabled the motor. Current position: "); */
+    Serial.print("(Didn't actually disable the motor, btw). Current position: ");
     Serial.println(motor.currentPosition() * DIRECTION);
   }
 }
