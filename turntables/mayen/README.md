@@ -1,5 +1,7 @@
 # Draaischijf Mayen
 
+TODO: fix description
+
 "NEMA 17" Stappenmotor met 200 stappen.
 
 `TMC2208` aansturing, dus die kan 1/2 tot 1/16 stap aan en is lekker geluidsarm.
