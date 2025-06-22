@@ -39,16 +39,23 @@ int state;
 
 // Positions
 long POS0 = 0;
-long POS1 = 6769;
-long POS2 = 13127;
-long POS3 = 19416;
-long POS4 = 25842;
-long POS5 = 31971;
-long POS6 = 38460;
-long POS7 = 44866;
-long POS8 = 51211;
-long POS9 = 57621;
-long POS10 = 64145;
+long POS_C9 = 6769;
+long POS_C8 = 13127;
+long POS_C7 = 19416;
+long POS_C6 = 25842;
+long POS_C5 = 31971;
+long POS_C4 = 38460;
+long POS_C3 = 44866;
+long POS_C2 = 51211;
+long POS_C1 = 57621;
+
+long POS_B1 = 64145;
+long POS_B2 = 57621;
+long POS_B3 = 51211;
+long POS_B4 = 44866;
+long POS_B5 = 38460;
+long POS_B6 = 31971;
+
 long POS_A5 = 77555;
 long POS_A4 = 84045;
 long POS_A3 = 90355;
@@ -102,7 +109,7 @@ void new_position(long target) {
     Serial.print("Moving first to ");
     Serial.print(target);
     Serial.print(", then to the actual target ");
-    Serial.printnl(actual_target);
+    Serial.println(actual_target);
   }
   else {
     move_to_actual_target_after_stopping = false;
@@ -152,22 +159,22 @@ void handle_key(char key) {
 
   if (selected_letter == 'B') {
     if (key == '6') {
-      new_position(POS5);
+      new_position(POS_B6);
     }
     else if (key == '5') {
-      new_position(POS6);
+      new_position(POS_B5);
     }
     else if (key == '4') {
-      new_position(POS7);
+      new_position(POS_B4);
     }
     else if (key == '3') {
-      new_position(POS8);
+      new_position(POS_B3);
     }
     else if (key == '2') {
-      new_position(POS9);
+      new_position(POS_B2);
     }
     else if (key == '1') {
-      new_position(POS10);
+      new_position(POS_B1);
     }
   }  // End of 'B'
 
@@ -176,31 +183,31 @@ void handle_key(char key) {
       new_position(POS0);
     }
     else if (key == '9') {
-      new_position(POS1);
+      new_position(POS_C9);
     }
     else if (key == '8') {
-      new_position(POS2);
+      new_position(POS_C8);
     }
     else if (key == '7') {
-      new_position(POS3);
+      new_position(POS_C7);
     }
     else if (key == '6') {
-      new_position(POS4);
+      new_position(POS_C6);
     }
     else if (key == '5') {
-      new_position(POS5);
+      new_position(POS_C5);
     }
     else if (key == '4') {
-      new_position(POS6);
+      new_position(POS_C4);
     }
     else if (key == '3') {
-      new_position(POS7);
+      new_position(POS_C3);
     }
     else if (key == '2') {
-      new_position(POS8);
+      new_position(POS_C2);
     }
     else if (key == '1') {
-      new_position(POS9);
+      new_position(POS_C1);
     }
   }  // End of 'C'
 
