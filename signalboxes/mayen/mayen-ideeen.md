@@ -7,26 +7,24 @@
 
 - 6x Signalhebel (2x voor het ene inrijsein, 4x voor de uitrijseinen).
 
-- 5x Weichenhebel.
+- 6x Weichenhebel.
 
-Dat zijn er 19. Hier ook 15 rode leds bij.
+Dat zijn er 16. Hier ook 16 rode leds bij.
 
-**34 pins**.
+**36 pins**. (Fahrstraßenhebel zijn aan-uit-aan en tellen dubbel).
 
 
 ## Output
 
 - 2 draden richting inrijsein.
 
-- 5 draden richting wissels via relais (voorlopig de conrad versie houden?).
+- 6 draden richting wissels via relais (voorlopig de conrad versie houden?).
 
 - 4 draden richting uitrijseinen (TODO: hoe die aan te sturen?)
 
-Nakijken hoe het zit met de polarisatie: volgens mij vanuit de wisselaandrijving geregeld, behalve de voorste. Misschien daar een extra relais voor nemen? Of die ook in eerste instantie zo laten? Ja.
+Nakijken hoe het zit met de polarisatie: volgens mij vanuit de wisselaandrijving geregeld, behalve de voorste. Misschien daar een extra relais voor nemen? Of die ook in eerste instantie zo laten? Ja. Maar in ieder geval voor twee wissels een polarisatie-relais erbij.
 
-Zowieso even nakijken hoe de wissels nu aan de schakelaar hangen. Enkelpolig? Hoe?
-
-**11 pins**
+**14 pins**
 
 ## Uitrijseinen
 
