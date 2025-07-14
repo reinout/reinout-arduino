@@ -20,7 +20,7 @@ void Waveshare_LCD1602::init()
 	begin(_cols, _rows);
 }
 
-void Waveshare_LCD1602::begin(uint8_t cols, uint8_t lines) 
+void Waveshare_LCD1602::begin(uint8_t cols, uint8_t lines)
 {
     if (lines > 1) {
         _showfunction |= LCD_2LINE;
@@ -41,7 +41,7 @@ void Waveshare_LCD1602::begin(uint8_t cols, uint8_t lines)
     ///< Send function set command sequence
     command(LCD_FUNCTIONSET | _showfunction);
     delay(5);  // wait more than 4.1ms
-	
+
 	///< second try
     command(LCD_FUNCTIONSET | _showfunction);
     delay(5);
@@ -176,8 +176,8 @@ void Waveshare_LCD1602::customSymbol(uint8_t location, uint8_t charmap[])
 
     location &= 0x7; // we only have 8 locations 0-7
     command(LCD_SETCGRAMADDR | (location << 3));
-    
-    
+
+
     uint8_t data[9];
     data[0] = 0x40;
     for(int i=0; i<8; i++)

@@ -61,7 +61,7 @@ class Waveshare_LCD1602
 {
 public:
 	Waveshare_LCD1602(uint8_t lcd_cols,uint8_t lcd_rows);
-	
+
 	void init();
 	void home();
 	void display();
