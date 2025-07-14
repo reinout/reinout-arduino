@@ -1,3 +1,3 @@
 include ../../base.mk
-BOARD = arduino:avr:unoTODO
+BOARD = arduino:avr:mega
 USB = /dev/cu.usbserial-210
