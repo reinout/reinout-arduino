@@ -58,9 +58,13 @@ int ROUTE_P2 = 18;
 int ROUTE_P3 = 19;
 int ROUTE_P4 = 20;
 int ROUTE_FIXATION = 21;
+int ROUTE_414 = 22;
+int ROUTE_514 = 22;
+int ROUTE_415 = 22;
+int ROUTE_515 = 22;
 
 // The states. All arrays with length 18.
-const int ARRAY_SIZE = 22;
+const int ARRAY_SIZE = 26;
 char *name[] [ARRAY_SIZE] = {
   "Gleiskontakt",  // Route recall
   "W1",  // Switch 1
@@ -84,6 +88,10 @@ char *name[] [ARRAY_SIZE] = {
   "f p3",
   "f p4",
   "Festlegen",  // Route fixation
+  "r 4-14", // Rangieren 4 - 14
+  "r 5-14", // Rangieren 4 - 14
+  "r 4-15", // Rangieren 4 - 14
+  "r 5-15", // Rangieren 4 - 14
 };
 
 boolean current_position [ARRAY_SIZE] = {
@@ -109,6 +117,10 @@ boolean current_position [ARRAY_SIZE] = {
   PLUS,
   PLUS,
   PLUS,  // Route fixation
+  PLUS,  // Rangieren 4-14
+  PLUS,
+  PLUS,
+  PLUS,
 };
 
 boolean blocked [ARRAY_SIZE] = {
@@ -134,6 +146,10 @@ boolean blocked [ARRAY_SIZE] = {
   false,
   false,
   false,  // Route fixation
+  false,  // Rangieren 4-14
+  false,
+  false,
+  false,
 };
 
 boolean requirements_fulfilled [ARRAY_SIZE] = {
@@ -159,6 +175,10 @@ boolean requirements_fulfilled [ARRAY_SIZE] = {
   false,
   false,
   false,  // Route fixation
+  false,  // Rangieren 4-14
+  false,
+  false,
+  false,
 };
 
 boolean position_is_ok [ARRAY_SIZE] = {
@@ -184,6 +204,10 @@ boolean position_is_ok [ARRAY_SIZE] = {
   true,
   true,
   true,  // Route fixation
+  true,  // Rangieren 4-14
+  true,
+  true,
+  true,
 };
 
 // Actual levers/buttons/locks.
@@ -242,7 +266,7 @@ void change_position(int number,
 
   current_position[number] = new_position;
   position_is_ok[number] = true;
-  write_second_line(name[number]);
+  write_second_line(*name[number]);
 
   update_requirements();
   update_blocks();
