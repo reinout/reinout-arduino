@@ -31,6 +31,8 @@ int PIN_LEVER_SWITCH_5 = 26;
 int PIN_LEVER_SWITCH_6 = 27;
 // TODO: signal levers
 
+// TODO: PIN_LED_SWITCH_etc
+
 
 // Display, 16 characters, 2 lines.
 Waveshare_LCD1602 display(16,2);
@@ -90,14 +92,14 @@ char *name[] [ARRAY_SIZE] = {
   "f p4",
   "Festlegen",  // Route fixation
   "r 4-14", // Rangieren 4 - 14
-  "r 5-14", // Rangieren 4 - 14
-  "r 4-15", // Rangieren 4 - 14
-  "r 5-15", // Rangieren 4 - 14
+  "r 5-14",
+  "r 4-15",
+  "r 5-15",
   "r in-5",  // Rangieren in - 5
 };
 
 boolean current_position [ARRAY_SIZE] = {
-  PLUS,  // Route recall
+  PLUS,  // Route recall, plus=rest, minus=train is passing
   PLUS,  // Switch 1
   PLUS,
   PLUS,
@@ -268,6 +270,7 @@ void update_requirements() {
   requirements_fulfilled[ROUTE_514] = false;
   requirements_fulfilled[ROUTE_515] = false;
   requirements_fulfilled[ROUTE_IN5] = false;
+  requirements_fulfilled[ROUTE_FIXATION] = false;
 
   if (current_position[SWITCH_1] == MINUS &&
       current_position[SWITCH_3] == MINUS &&
@@ -324,6 +327,16 @@ void update_requirements() {
   }
 
   // If a route switch is MINUS, it can be fixated.
+  if (current_position[ROUTE_G1] == MINUS ||
+      current_position[ROUTE_G2] == MINUS ||
+      current_position[ROUTE_G3] == MINUS ||
+      current_position[ROUTE_G4] == MINUS ||
+      current_position[ROUTE_P1] == MINUS ||
+      current_position[ROUTE_P2] == MINUS ||
+      current_position[ROUTE_P3] == MINUS ||
+      current_position[ROUTE_P4] == MINUS) {
+    requirements_fulfilled[ROUTE_FIXATION] = true;
+  }
 
 
 }
