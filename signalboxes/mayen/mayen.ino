@@ -59,12 +59,13 @@ int ROUTE_P3 = 19;
 int ROUTE_P4 = 20;
 int ROUTE_FIXATION = 21;
 int ROUTE_414 = 22;
-int ROUTE_514 = 22;
-int ROUTE_415 = 22;
-int ROUTE_515 = 22;
+int ROUTE_514 = 23;
+int ROUTE_415 = 24;
+int ROUTE_515 = 25;
+int ROUTE_IN5 = 26;  // Rangier in <-> 5
 
 // The states. All arrays with length 18.
-const int ARRAY_SIZE = 26;
+const int ARRAY_SIZE = 27;
 char *name[] [ARRAY_SIZE] = {
   "Gleiskontakt",  // Route recall
   "W1",  // Switch 1
@@ -92,6 +93,7 @@ char *name[] [ARRAY_SIZE] = {
   "r 5-14", // Rangieren 4 - 14
   "r 4-15", // Rangieren 4 - 14
   "r 5-15", // Rangieren 4 - 14
+  "r in-5",  // Rangieren in - 5
 };
 
 boolean current_position [ARRAY_SIZE] = {
@@ -118,6 +120,7 @@ boolean current_position [ARRAY_SIZE] = {
   PLUS,
   PLUS,  // Route fixation
   PLUS,  // Rangieren 4-14
+  PLUS,
   PLUS,
   PLUS,
   PLUS,
@@ -150,6 +153,7 @@ boolean blocked [ARRAY_SIZE] = {
   false,
   false,
   false,
+  false,
 };
 
 boolean requirements_fulfilled [ARRAY_SIZE] = {
@@ -179,6 +183,7 @@ boolean requirements_fulfilled [ARRAY_SIZE] = {
   false,
   false,
   false,
+  false,
 };
 
 boolean position_is_ok [ARRAY_SIZE] = {
@@ -205,6 +210,7 @@ boolean position_is_ok [ARRAY_SIZE] = {
   true,
   true,  // Route fixation
   true,  // Rangieren 4-14
+  true,
   true,
   true,
   true,
@@ -244,21 +250,124 @@ boolean movement_allowed (int number) {
   return (blocked[number] == false && requirements_fulfilled[number] == true);
 }
 
-void update_requirements() {}
-void update_blocks() {}
+void update_requirements() {
+  // Requirements flow "upwards". The correct switch positions can enable
+  // routes. Enabled routes plus an enabled route fixation can enable signals.
 
-void write_first_halfline(char* text) {
-  display.setCursor(0,0);
-  display.send_string("        ");
-  display.setCursor(0,0);
-  display.send_string(text);
+  // Requirements fulfilled by the switches.
+  requirements_fulfilled[ROUTE_G1] = false;
+  requirements_fulfilled[ROUTE_G2] = false;
+  requirements_fulfilled[ROUTE_G3] = false;
+  requirements_fulfilled[ROUTE_G4] = false;
+  requirements_fulfilled[ROUTE_P1] = false;
+  requirements_fulfilled[ROUTE_P2] = false;
+  requirements_fulfilled[ROUTE_P3] = false;
+  requirements_fulfilled[ROUTE_P4] = false;
+  requirements_fulfilled[ROUTE_414] = false;
+  requirements_fulfilled[ROUTE_415] = false;
+  requirements_fulfilled[ROUTE_514] = false;
+  requirements_fulfilled[ROUTE_515] = false;
+  requirements_fulfilled[ROUTE_IN5] = false;
+
+  if (current_position[SWITCH_1] == MINUS &&
+      current_position[SWITCH_3] == MINUS &&
+      current_position[SWITCH_4] == PLUS) {
+    requirements_fulfilled[ROUTE_G1] = true;
+    requirements_fulfilled[ROUTE_P1] = true;
+  }
+  if (current_position[SWITCH_1] == MINUS &&
+      current_position[SWITCH_3] == PLUS &&
+      current_position[SWITCH_4] == PLUS) {
+    requirements_fulfilled[ROUTE_G2] = true;
+    requirements_fulfilled[ROUTE_P2] = true;
+  }
+  if (current_position[SWITCH_1] == PLUS &&
+      current_position[SWITCH_2] == PLUS &&
+      current_position[SWITCH_4] == PLUS) {
+    requirements_fulfilled[ROUTE_G3] = true;
+    requirements_fulfilled[ROUTE_P3] = true;
+  }
+  if (current_position[SWITCH_1] == PLUS &&
+      current_position[SWITCH_2] == MINUS &&
+      current_position[SWITCH_4] == MINUS &&
+      current_position[SWITCH_5] == PLUS &&
+      current_position[SWITCH_6] == PLUS) {
+    requirements_fulfilled[ROUTE_G4] = true;
+    requirements_fulfilled[ROUTE_P4] = true;
+  }
+  if (current_position[SWITCH_4] == PLUS &&
+      current_position[SWITCH_5] == PLUS &&
+      current_position[SWITCH_6] == PLUS) {
+    requirements_fulfilled[ROUTE_414] = true;
+  }
+  if (current_position[SWITCH_4] == PLUS &&
+      current_position[SWITCH_5] == MINUS &&
+      current_position[SWITCH_6] == PLUS) {
+    requirements_fulfilled[ROUTE_415] = true;
+  }
+  if (current_position[SWITCH_4] == PLUS &&
+      current_position[SWITCH_5] == PLUS &&
+      current_position[SWITCH_6] == MINUS) {
+    requirements_fulfilled[ROUTE_514] = true;
+  }
+  if (current_position[SWITCH_4] == PLUS &&
+      current_position[SWITCH_5] == MINUS &&
+      current_position[SWITCH_6] == MINUS) {
+    requirements_fulfilled[ROUTE_515] = true;
+  }
+  if (current_position[SWITCH_1] == PLUS &&
+      current_position[SWITCH_2] == MINUS &&
+      current_position[SWITCH_4] == MINUS &&
+      current_position[SWITCH_5] == PLUS &&
+      current_position[SWITCH_6] == MINUS) {
+    requirements_fulfilled[ROUTE_IN5] = true;
+  }
+
+  // If a route switch is MINUS, it can be fixated.
+
+
 }
 
-void write_second_line(char* text) {
+void update_blocks() {}
+
+void write_first_line() {
+  display.setCursor(9,0);
+  display.send_string("        ");
+  display.setCursor(9,0);
+  if (requirements_fulfilled[ROUTE_414]) {
+    display.send_string("14 -- 4");
+  }
+  if (requirements_fulfilled[ROUTE_415]) {
+    display.send_string("15 -- 4");
+  }
+  if (requirements_fulfilled[ROUTE_514]) {
+    display.send_string("14 -- 5");
+  }
+  if (requirements_fulfilled[ROUTE_515]) {
+    display.send_string("15 -- 5");
+  }
+  if (requirements_fulfilled[ROUTE_IN5]) {
+    display.send_string("in -- 5");
+  }
+}
+
+void write_second_line() {
   display.setCursor(0,1);
-  display.send_string("                 ");
+  display.send_string("        ");
   display.setCursor(0,1);
-  display.send_string(text);
+  if (requirements_fulfilled[ROUTE_G1]) {
+    display.send_string("in -- 1");
+  }
+  if (requirements_fulfilled[ROUTE_G2]) {
+    display.send_string("in -- 2");
+  }
+  if (requirements_fulfilled[ROUTE_G3]) {
+    display.send_string("in -- 3");
+  }
+  if (requirements_fulfilled[ROUTE_G4]) {
+    display.send_string("in -- 4");
+  }
+  // TODO: if position[ROUTE_G1/P1], then '<--'. Locked? '<=='
 }
 
 void change_position(int number,
@@ -266,11 +375,12 @@ void change_position(int number,
 
   current_position[number] = new_position;
   position_is_ok[number] = true;
-  write_second_line(*name[number]);
 
   update_requirements();
   update_blocks();
   update_outputs();
+  write_first_line();
+  write_second_line();
 
   /* // Special case: fixating a route enables the corresponding signal. This way */
   /* // it can be thrown once (instead of through normal requirements, then it */
@@ -325,9 +435,6 @@ void react_to_movement(int number,
 
 void setup() {
   display.init();
-  display.setCursor(0,0);
-  // display.send_string("in - 3    14 - 4");
-  display.send_string("in<--3    14 - 4");
 
   // Attach the output pins
   pinMode(PIN_OUTPUT_SWITCH_1, OUTPUT);
