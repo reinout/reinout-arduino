@@ -30,6 +30,14 @@ int PIN_LEVER_SWITCH_4 = 25;
 int PIN_LEVER_SWITCH_5 = 26;
 int PIN_LEVER_SWITCH_6 = 27;
 // TODO: signal levers
+int PIN_LEVER_SIGNAL_G1 = 33;
+int PIN_LEVER_SIGNAL_G2 = 32;
+int PIN_LEVER_SIGNAL_P1 = 31;
+int PIN_LEVER_SIGNAL_P2 = 30;
+int PIN_LEVER_SIGNAL_P3 = 29;
+int PIN_LEVER_SIGNAL_P4 = 28;
+
+// TODO: route selector levers
 
 // TODO: PIN_LED_SWITCH_etc
 
@@ -64,11 +72,11 @@ int ROUTE_414 = 22;
 int ROUTE_514 = 23;
 int ROUTE_415 = 24;
 int ROUTE_515 = 25;
-int ROUTE_IN5 = 26;  // Rangier in <-> 5
+int ROUTE_IN5 = 26;  // Rangieren in <-> 5
 
 // The states. All arrays with length 18.
 const int ARRAY_SIZE = 27;
-char *name[] [ARRAY_SIZE] = {
+char name[] [ARRAY_SIZE] = {
   "Gleiskontakt",  // Route recall
   "W1",  // Switch 1
   "W2",
@@ -166,12 +174,12 @@ boolean requirements_fulfilled [ARRAY_SIZE] = {
   true,
   true,
   true,
-  false,  // Signal P1
-  false,
-  false,
-  false,
-  false,  // Signal G1
-  false,
+  true,  // Signal P1  TODO set signals to true
+  true,
+  true,
+  true,
+  true,  // Signal G1  TODO set signals to true
+  true,
   false,  // Route G1
   false,
   false,
@@ -386,6 +394,13 @@ void write_second_line() {
 void change_position(int number,
                      boolean new_position) {
 
+  // Debug stuff.
+  display.setCursor(0,0);
+  display.send_string("        ");
+  display.setCursor(0,0);
+  display.send_string(name[number]);
+  // End debug stuff
+
   current_position[number] = new_position;
   position_is_ok[number] = true;
 
@@ -468,6 +483,13 @@ void setup() {
   pinMode(PIN_LEVER_SWITCH_5, INPUT_PULLUP);
   pinMode(PIN_LEVER_SWITCH_6, INPUT_PULLUP);
 
+  pinMode(PIN_LEVER_SIGNAL_G1, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SIGNAL_G2, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SIGNAL_P4, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SIGNAL_P3, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SIGNAL_P2, INPUT_PULLUP);
+  pinMode(PIN_LEVER_SIGNAL_P1, INPUT_PULLUP);
+
   // First make sure the output pins are OK
   update_outputs();
 
@@ -478,6 +500,13 @@ void setup() {
   levers[SWITCH_4].attach(PIN_LEVER_SWITCH_4);
   levers[SWITCH_5].attach(PIN_LEVER_SWITCH_5);
   levers[SWITCH_6].attach(PIN_LEVER_SWITCH_6);
+
+  levers[SIGNAL_G1].attach(PIN_LEVER_SIGNAL_G1);
+  levers[SIGNAL_G2].attach(PIN_LEVER_SIGNAL_G2);
+  levers[SIGNAL_P1].attach(PIN_LEVER_SIGNAL_P1);
+  levers[SIGNAL_P2].attach(PIN_LEVER_SIGNAL_P2);
+  levers[SIGNAL_P3].attach(PIN_LEVER_SIGNAL_P3);
+  levers[SIGNAL_P4].attach(PIN_LEVER_SIGNAL_P4);
   // Set bounce behavior.
   for (int number = 0; number < ARRAY_SIZE; number++) {
     levers[number].interval(200);
