@@ -5,6 +5,9 @@
 bool PLUS = true;
 bool MINUS = false;
 
+// Debug stuff
+int PIN_BOARD_LED = 13;
+
 // Relais pins. Switch x also means the relais for the polarisation for switch x.
 // Pulling to 0 means the non-default "minus" position for switches.
 int PIN_OUTPUT_SWITCH_1 = 2;
@@ -40,13 +43,28 @@ int PIN_LEVER_SIGNAL_P4 = 28;
 // TODO: route selector levers
 
 // TODO: PIN_LED_SWITCH_etc
+int PIN_LED_SWITCH_1 = 34;
+int PIN_LED_SWITCH_2 = 35;
+int PIN_LED_SWITCH_3 = 36;
+int PIN_LED_SWITCH_4 = 37;
+int PIN_LED_SWITCH_5 = 38;
+int PIN_LED_SWITCH_6 = 39;
 
+int PIN_LED_SIGNAL_G1 = 45;
+int PIN_LED_SIGNAL_G2 = 44;
+int PIN_LED_SIGNAL_P1 = 43;
+int PIN_LED_SIGNAL_P2 = 42;
+int PIN_LED_SIGNAL_P3 = 41;
+int PIN_LED_SIGNAL_P4 = 40;
+
+// PINs for extra thingies
+int PIN_TRACK_CONTACT = A0;
 
 // Display, 16 characters, 2 lines.
 Waveshare_LCD1602 display(16,2);
 
 // Array index numbers. These are columns in the locking table.
-int ROUTE_RECALL = 0;
+int TRACK_CONTACT = 0;
 int SWITCH_1 = 1;
 int SWITCH_2 = 2;
 int SWITCH_3 = 3;
@@ -77,7 +95,7 @@ int ROUTE_IN5 = 26;  // Rangieren in <-> 5
 // The states. All arrays with length 18.
 const int ARRAY_SIZE = 27;
 char name[] [ARRAY_SIZE] = {
-  "Gleiskontakt",  // Route recall
+  "Contact",  // Route recall
   "W1",  // Switch 1
   "W2",
   "W3",
@@ -98,7 +116,7 @@ char name[] [ARRAY_SIZE] = {
   "f p2",
   "f p3",
   "f p4",
-  "Festlegen",  // Route fixation
+  "Fix",  // Route fixation
   "r 4-14", // Rangieren 4 - 14
   "r 5-14",
   "r 4-15",
@@ -167,19 +185,19 @@ boolean blocked [ARRAY_SIZE] = {
 };
 
 boolean requirements_fulfilled [ARRAY_SIZE] = {
-  false,  // Route recall
+  true,  // Route recall  TODO set to false
   true,  // Switch 1
   true,
   true,
   true,
   true,
   true,
-  true,  // Signal P1  TODO set signals to true
-  true,
-  true,
-  true,
-  true,  // Signal G1  TODO set signals to true
-  true,
+  false,  // Signal P1
+  false,
+  false,
+  false,
+  false,  // Signal G1
+  false,
   false,  // Route G1
   false,
   false,
@@ -391,15 +409,17 @@ void write_second_line() {
   // TODO: if position[ROUTE_G1/P1], then '<--'. Locked? '<=='
 }
 
+void write_debug_info(int number) {
+  display.setCursor(0,0);
+  display.send_string("         ");
+  display.setCursor(0,0);
+  display.send_string(name[number]);
+}
+
 void change_position(int number,
                      boolean new_position) {
 
-  // Debug stuff.
-  display.setCursor(0,0);
-  display.send_string("        ");
-  display.setCursor(0,0);
-  display.send_string(name[number]);
-  // End debug stuff
+  write_debug_info(number);  // Debug stuff.
 
   current_position[number] = new_position;
   position_is_ok[number] = true;
@@ -460,9 +480,51 @@ void react_to_movement(int number,
 }
 
 
+void update_single_lever_led(int pin, int number) {
+  if (position_is_ok[number] == false) {
+    if ((millis() % 500) > 250) {
+      digitalWrite(pin, LOW);
+    }
+    else {
+      digitalWrite(pin, HIGH);
+    }
+  }
+  else {
+    if (movement_allowed(number)) {
+      digitalWrite(pin, HIGH);
+    }
+    else {
+      digitalWrite(pin, LOW);
+    }
+  }
+}
+
+
+void update_dual_lever_led(int pin, int number1, int number2) {
+  if (position_is_ok[number1] == false || position_is_ok[number2] == false) {
+    if ((millis() % 500) > 250) {
+      digitalWrite(pin, LOW);
+    }
+    else {
+      digitalWrite(pin, HIGH);
+    }
+  }
+  else {
+    if (movement_allowed(number1) || movement_allowed(number2)) {
+      digitalWrite(pin, HIGH);
+    }
+    else {
+      digitalWrite(pin, LOW);
+    }
+  }
+
+}
 
 void setup() {
   display.init();
+
+  // Debug led
+  pinMode(PIN_BOARD_LED, OUTPUT);
 
   // Attach the output pins
   pinMode(PIN_OUTPUT_SWITCH_1, OUTPUT);
@@ -490,6 +552,24 @@ void setup() {
   pinMode(PIN_LEVER_SIGNAL_P2, INPUT_PULLUP);
   pinMode(PIN_LEVER_SIGNAL_P1, INPUT_PULLUP);
 
+  // Attach the extra stuff
+  pinMode(PIN_TRACK_CONTACT, INPUT_PULLUP);
+
+  // Attach the LEDs
+  pinMode(PIN_LED_SWITCH_1, OUTPUT);
+  pinMode(PIN_LED_SWITCH_2, OUTPUT);
+  pinMode(PIN_LED_SWITCH_3, OUTPUT);
+  pinMode(PIN_LED_SWITCH_4, OUTPUT);
+  pinMode(PIN_LED_SWITCH_5, OUTPUT);
+  pinMode(PIN_LED_SWITCH_6, OUTPUT);
+
+  pinMode(PIN_LED_SIGNAL_P1, OUTPUT);
+  pinMode(PIN_LED_SIGNAL_P2, OUTPUT);
+  pinMode(PIN_LED_SIGNAL_P3, OUTPUT);
+  pinMode(PIN_LED_SIGNAL_P4, OUTPUT);
+  pinMode(PIN_LED_SIGNAL_G1, OUTPUT);
+  pinMode(PIN_LED_SIGNAL_G2, OUTPUT);
+
   // First make sure the output pins are OK
   update_outputs();
 
@@ -507,12 +587,16 @@ void setup() {
   levers[SIGNAL_P2].attach(PIN_LEVER_SIGNAL_P2);
   levers[SIGNAL_P3].attach(PIN_LEVER_SIGNAL_P3);
   levers[SIGNAL_P4].attach(PIN_LEVER_SIGNAL_P4);
+
+  levers[TRACK_CONTACT].attach(PIN_TRACK_CONTACT);
   // Set bounce behavior.
   for (int number = 0; number < ARRAY_SIZE; number++) {
     levers[number].interval(200);
   }
   // TODO Special case: route fixation button should take some seconds to activate.
   // levers[ROUTE_AP_FIXATION].interval(2000);
+  levers[TRACK_CONTACT].interval(500);
+  // TODO probleem: varieert tussen 1 en 0 volt...
 
   // look up the initial lever positions and update accordingly.
   for (int number = 0; number < ARRAY_SIZE; number++) {
@@ -539,4 +623,20 @@ void loop() {
       react_to_movement(number, MINUS);
     }
   }
+
+  // Update the LEDs.
+  update_single_lever_led(PIN_LED_SWITCH_1, SWITCH_1);
+  update_single_lever_led(PIN_LED_SWITCH_2, SWITCH_2);
+  update_single_lever_led(PIN_LED_SWITCH_3, SWITCH_3);
+  update_single_lever_led(PIN_LED_SWITCH_4, SWITCH_4);
+  update_single_lever_led(PIN_LED_SWITCH_5, SWITCH_5);
+  update_single_lever_led(PIN_LED_SWITCH_6, SWITCH_6);
+
+  update_single_lever_led(PIN_LED_SIGNAL_P1, SIGNAL_P1);
+  update_single_lever_led(PIN_LED_SIGNAL_P2, SIGNAL_P2);
+  update_single_lever_led(PIN_LED_SIGNAL_P3, SIGNAL_P3);
+  update_single_lever_led(PIN_LED_SIGNAL_P4, SIGNAL_P4);
+  update_single_lever_led(PIN_LED_SIGNAL_G1, SIGNAL_G1);
+  update_single_lever_led(PIN_LED_SIGNAL_G2, SIGNAL_G2);
+
 }
