@@ -501,22 +501,53 @@ void write_first_line() {
 }
 
 void write_second_line() {
+  char* msg;
+  char* arrow;
+  char* track;
+  arrow = " -- ";
+
   display.setCursor(0,1);
-  display.send_string("        ");
+  display.send_string("          ");
+
   display.setCursor(0,1);
   if (requirements_fulfilled[ROUTE_G1]) {
-    display.send_string("in -- 1");
+    track = "1";
   }
   if (requirements_fulfilled[ROUTE_G2]) {
-    display.send_string("in -- 2");
+    track = "2";
   }
   if (requirements_fulfilled[ROUTE_G3]) {
-    display.send_string("in -- 3");
+    track = "3";
   }
   if (requirements_fulfilled[ROUTE_G4]) {
-    display.send_string("in -- 4");
+    track = "4";
   }
-  // TODO: if position[ROUTE_G1/P1], then '<--'. Locked? '<=='
+
+  if (current_position[ROUTE_P1] == MINUS ||
+      current_position[ROUTE_P2] == MINUS ||
+      current_position[ROUTE_P3] == MINUS ||
+      current_position[ROUTE_P4] == MINUS) {
+    if (current_position[ROUTE_FIXATION] == MINUS) {
+      arrow = "<== ";
+    }
+    else {
+      arrow = "<-- ";
+    }
+  }
+  if (current_position[ROUTE_G1] == MINUS ||
+      current_position[ROUTE_G2] == MINUS ||
+      current_position[ROUTE_G3] == MINUS ||
+      current_position[ROUTE_G4] == MINUS) {
+    if (current_position[ROUTE_FIXATION] == MINUS) {
+      arrow = " ==>";
+    }
+    else {
+      arrow = " -->";
+    }
+  }
+
+  sprintf(msg, "in%s%s", arrow, track);
+  display.send_string(msg);
 }
 
 void write_debug_info(int number) {
@@ -529,7 +560,7 @@ void write_debug_info(int number) {
 void change_position(int number,
                      boolean new_position) {
 
-  write_debug_info(number);  // Debug stuff.
+  // write_debug_info(number);  // Debug stuff.
 
   current_position[number] = new_position;
   position_is_ok[number] = true;
