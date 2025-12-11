@@ -51,12 +51,12 @@ int PIN_LEVER_ROUTE_P3 = 52;
 int PIN_LEVER_ROUTE_P4 = 53;
 
 // TODO: PIN_LED_SWITCH_etc
-int PIN_LED_SWITCH_1 = 34;
-int PIN_LED_SWITCH_2 = 35;
-int PIN_LED_SWITCH_3 = 36;
-int PIN_LED_SWITCH_4 = 37;
-int PIN_LED_SWITCH_5 = 38;
-int PIN_LED_SWITCH_6 = 39;
+int PIN_LED_SWITCH_1 = 39;
+int PIN_LED_SWITCH_2 = 38;
+int PIN_LED_SWITCH_3 = 37;
+int PIN_LED_SWITCH_4 = 36;
+int PIN_LED_SWITCH_5 = 35;
+int PIN_LED_SWITCH_6 = 34;
 
 int PIN_LED_SIGNAL_G1 = 45;
 int PIN_LED_SIGNAL_G2 = 44;
@@ -287,6 +287,7 @@ void update_outputs() {
   update_output(PIN_OUTPUT_SIGNAL_P3, SIGNAL_P3);
   update_output(PIN_OUTPUT_SIGNAL_P4, SIGNAL_P4);
   // TODO: G1/2
+  update_output(PIN_LED_ROUTE_FIXATION, ROUTE_FIXATION);
 }
 
 
@@ -383,7 +384,100 @@ void update_requirements() {
 
 }
 
-void update_blocks() {}
+void update_blocks() {
+  // Blocks flow "downwards". A route lever blocks switches. A route fixation
+  // blocks a route lever.
+
+  // Reset all blocks.
+  for (int number = 0; number < ARRAY_SIZE; number++) {
+    blocked[number] = false;
+  }
+
+  // Route levers block each other. And they block switches.
+  if (current_position[ROUTE_P1] == MINUS || current_position[ROUTE_G1] == MINUS ) {
+    blocked[ROUTE_P2] = true;
+    blocked[ROUTE_P3] = true;
+    blocked[ROUTE_P4] = true;
+    blocked[ROUTE_G2] = true;
+    blocked[ROUTE_G3] = true;
+    blocked[ROUTE_G4] = true;
+
+    blocked[SWITCH_1] = true;
+    blocked[SWITCH_3] = true;
+    blocked[SWITCH_4] = true;
+  }
+
+  if (current_position[ROUTE_P2] == MINUS || current_position[ROUTE_G2] == MINUS ) {
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P3] = true;
+    blocked[ROUTE_P4] = true;
+    blocked[ROUTE_G1] = true;
+    blocked[ROUTE_G3] = true;
+    blocked[ROUTE_G4] = true;
+
+    blocked[SWITCH_1] = true;
+    blocked[SWITCH_3] = true;
+    blocked[SWITCH_4] = true;
+  }
+  if (current_position[ROUTE_P3] == MINUS || current_position[ROUTE_G3] == MINUS ) {
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P2] = true;
+    blocked[ROUTE_P4] = true;
+    blocked[ROUTE_G1] = true;
+    blocked[ROUTE_G2] = true;
+    blocked[ROUTE_G4] = true;
+
+    blocked[SWITCH_1] = true;
+    blocked[SWITCH_2] = true;
+    blocked[SWITCH_4] = true;
+  }
+  if (current_position[ROUTE_P4] == MINUS || current_position[ROUTE_G4] == MINUS ) {
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P2] = true;
+    blocked[ROUTE_P3] = true;
+    blocked[ROUTE_G1] = true;
+    blocked[ROUTE_G2] = true;
+    blocked[ROUTE_G3] = true;
+
+    blocked[SWITCH_1] = true;
+    blocked[SWITCH_2] = true;
+    blocked[SWITCH_4] = true;
+    blocked[SWITCH_5] = true;
+    blocked[SWITCH_6] = true;
+  }
+
+  // Route fixation blocks routes.
+  if (current_position[ROUTE_FIXATION] == MINUS) {
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P2] = true;
+    blocked[ROUTE_P4] = true;
+    blocked[ROUTE_P4] = true;
+    blocked[ROUTE_G1] = true;
+    blocked[ROUTE_G2] = true;
+    blocked[ROUTE_G4] = true;
+    blocked[ROUTE_G4] = true;
+    // Special case: also keep yourself blocked (it is only un-blocked by
+    // moving a signal back to PLUS).
+    // TODO: state is not really retained?
+    blocked[ROUTE_FIXATION] = true;
+  }
+
+  // Only one signal can be active, so any signal whatsoever blocks all routes.
+  if (current_position[SIGNAL_P1] == MINUS ||
+      current_position[SIGNAL_P2] == MINUS ||
+      current_position[SIGNAL_P3] == MINUS ||
+      current_position[SIGNAL_P4] == MINUS ||
+      current_position[SIGNAL_G1] == MINUS ||
+      current_position[SIGNAL_G2] == MINUS) {
+    blocked[ROUTE_P1] = true;
+    blocked[ROUTE_P2] = true;
+    blocked[ROUTE_P3] = true;
+    blocked[ROUTE_P4] = true;
+    blocked[ROUTE_G1] = true;
+    blocked[ROUTE_G2] = true;
+  }
+
+}
 
 void write_first_line() {
   display.setCursor(9,0);
@@ -446,40 +540,83 @@ void change_position(int number,
   write_first_line();
   write_second_line();
 
-  /* // Special case: fixating a route enables the corresponding signal. This way */
-  /* // it can be thrown once (instead of through normal requirements, then it */
-  /* // would have been possible to throw it multiple times). It also enables the */
-  /* // corresponding route recall. */
-  /* if (number == ROUTE_AP_FIXATION && new_position == MINUS) { */
-  /*   requirements_fulfilled[ROUTE_AP_RECALL] = true; */
-  /*   if (current_position[ROUTE_A1] == MINUS) { */
-  /*     requirements_fulfilled[SIGNAL_A1] = true; */
-  /*   } */
-  /*   if (current_position[ROUTE_A2] == MINUS) { */
-  /*     requirements_fulfilled[SIGNAL_A2] = true; */
-  /*   } */
-  /* } */
+  // Special case: fixating a route enables the corresponding signal. This way
+  // it can be thrown once (instead of through normal requirements, then it
+  // would have been possible to throw it multiple times). It also enables the
+  // corresponding route recall.
+  if (number == ROUTE_FIXATION && new_position == MINUS) {
+    requirements_fulfilled[TRACK_CONTACT] = true;
+    // TODO: probably activate it? Or increase its bounce value?
+    if (current_position[ROUTE_P1] == MINUS) {
+      requirements_fulfilled[SIGNAL_P1] = true;
+    }
+    if (current_position[ROUTE_P2] == MINUS) {
+      requirements_fulfilled[SIGNAL_P2] = true;
+    }
+    if (current_position[ROUTE_P3] == MINUS) {
+      requirements_fulfilled[SIGNAL_P3] = true;
+    }
+    if (current_position[ROUTE_P4] == MINUS) {
+      requirements_fulfilled[SIGNAL_P4] = true;
+    }
+    if (current_position[ROUTE_G1] == MINUS) {
+      requirements_fulfilled[SIGNAL_G2] = true;  // HP2
+    }
+    if (current_position[ROUTE_G2] == MINUS) {
+      requirements_fulfilled[SIGNAL_G2] = true;  // HP2
+    }
+    if (current_position[ROUTE_G3] == MINUS) {
+      requirements_fulfilled[SIGNAL_G1] = true;  // HP1
+    }
+    if (current_position[ROUTE_G4] == MINUS) {
+      requirements_fulfilled[SIGNAL_G2] = true;  // HP2
+    }
+  }
 
-  /* // Special case: route recall frees the route fixation. */
-  /* if (number == ROUTE_AP_RECALL) { */
-  /*   // Any new position is OK, we don't care which way the lock is turned. */
-  /*   change_position(ROUTE_AP_FIXATION, PLUS); */
-  /* } */
+  // Special case: track contact enabled? Increase the bounce value so that it takes its
+  // time falling back to PLUS.
+  if (number == TRACK_CONTACT && new_position == MINUS) {
+    levers[TRACK_CONTACT].interval(4000);
+  }
+  // Special case: track contact frees the route fixation. And disables itself.
+  if (number == TRACK_CONTACT && new_position == PLUS) {
+    levers[TRACK_CONTACT].interval(100);  // Back to normal twitchy behaviour.
+    change_position(ROUTE_FIXATION, PLUS);
+    requirements_fulfilled[TRACK_CONTACT] = false;
+  }
 
-  /* // Special case: signals going back to PLUS remove their own "requirements */
-  /* // fulfilled" marker. */
-  /* if (number == SIGNAL_A1 && new_position == PLUS) { */
-  /*     requirements_fulfilled[SIGNAL_A1] = false; */
-  /* } */
-  /* if (number == SIGNAL_A2 && new_position == PLUS) { */
-  /*     requirements_fulfilled[SIGNAL_A2] = false; */
-  /* } */
+  // Special case: signals going back to PLUS remove their own "requirements
+  // fulfilled" marker.
+  if (number == SIGNAL_P1 && new_position == PLUS) {
+      requirements_fulfilled[SIGNAL_P1] = false;
+  }
+  if (number == SIGNAL_P2 && new_position == PLUS) {
+      requirements_fulfilled[SIGNAL_P2] = false;
+  }
+  if (number == SIGNAL_P3 && new_position == PLUS) {
+      requirements_fulfilled[SIGNAL_P3] = false;
+  }
+  if (number == SIGNAL_P4 && new_position == PLUS) {
+      requirements_fulfilled[SIGNAL_P4] = false;
+  }
+  if (number == SIGNAL_G1 && new_position == PLUS) {
+      requirements_fulfilled[SIGNAL_G1] = false;
+  }
+  if (number == SIGNAL_G2 && new_position == PLUS) {
+      requirements_fulfilled[SIGNAL_G2] = false;
+  }
 
 }
 
 
 void react_to_movement(int number,
                        boolean new_position) {
+  if (number == ROUTE_FIXATION && new_position == PLUS) {
+    // Ignore this, we only want to know if the route fixation button was activated.
+    // Deactivation happens via the track contact.
+    return;
+  }
+
   if (movement_allowed(number)) {
     change_position(number, new_position);
   }
@@ -601,6 +738,8 @@ void setup() {
   pinMode(PIN_LED_ROUTE_3, OUTPUT);
   pinMode(PIN_LED_ROUTE_4, OUTPUT);
 
+  pinMode(PIN_LED_ROUTE_FIXATION, OUTPUT);
+
   // First make sure the output pins are OK
   update_outputs();
 
@@ -637,8 +776,8 @@ void setup() {
   }
   // Special case: route fixation button should take two second to activate.
   levers[ROUTE_FIXATION].interval(2000);
-  // TODO: special class handling.
-  levers[TRACK_CONTACT].interval(500);
+  // And the track contact should have really twitchy behaviour.
+  levers[TRACK_CONTACT].interval(100);
 
   // look up the initial lever positions and update accordingly.
   for (int number = 0; number < ARRAY_SIZE; number++) {
