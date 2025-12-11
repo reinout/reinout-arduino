@@ -23,7 +23,7 @@ int PIN_OUTPUT_SIGNAL_P1 = 8;
 int PIN_OUTPUT_SIGNAL_P2 = 9;
 int PIN_OUTPUT_SIGNAL_P3 = 10;
 int PIN_OUTPUT_SIGNAL_P4 = 11;
-// TODO: F1/2 signal (not relais, though).
+// TODO: G1/2 signal (not relais, though).
 
 // Lever pins
 int PIN_LEVER_SWITCH_1 = 22;
@@ -41,6 +41,14 @@ int PIN_LEVER_SIGNAL_P3 = 29;
 int PIN_LEVER_SIGNAL_P4 = 28;
 
 // TODO: route selector levers
+int PIN_LEVER_ROUTE_G1 = 46;
+int PIN_LEVER_ROUTE_G2 = 47;
+int PIN_LEVER_ROUTE_G3 = 48;
+int PIN_LEVER_ROUTE_G4 = 49;
+int PIN_LEVER_ROUTE_P1 = 50;
+int PIN_LEVER_ROUTE_P2 = 51;
+int PIN_LEVER_ROUTE_P3 = 52;
+int PIN_LEVER_ROUTE_P4 = 53;
 
 // TODO: PIN_LED_SWITCH_etc
 int PIN_LED_SWITCH_1 = 34;
@@ -57,8 +65,16 @@ int PIN_LED_SIGNAL_P2 = 42;
 int PIN_LED_SIGNAL_P3 = 41;
 int PIN_LED_SIGNAL_P4 = 40;
 
+int PIN_LED_ROUTE_1 = A15;
+int PIN_LED_ROUTE_2 = A14;
+int PIN_LED_ROUTE_3 = A13;
+int PIN_LED_ROUTE_4 = A12;
+
+int PIN_LED_ROUTE_FIXATION = A10;
+
 // PINs for extra thingies
 int PIN_TRACK_CONTACT = A0;
+int PIN_BUTTON_ROUTE_FIXATION = A11;
 
 // Display, 16 characters, 2 lines.
 Waveshare_LCD1602 display(16,2);
@@ -552,8 +568,18 @@ void setup() {
   pinMode(PIN_LEVER_SIGNAL_P2, INPUT_PULLUP);
   pinMode(PIN_LEVER_SIGNAL_P1, INPUT_PULLUP);
 
+  pinMode(PIN_LEVER_ROUTE_P1, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_P2, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_P3, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_P4, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_G1, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_G2, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_G3, INPUT_PULLUP);
+  pinMode(PIN_LEVER_ROUTE_G4, INPUT_PULLUP);
+
   // Attach the extra stuff
   pinMode(PIN_TRACK_CONTACT, INPUT_PULLUP);
+  pinMode(PIN_BUTTON_ROUTE_FIXATION, INPUT_PULLUP);
 
   // Attach the LEDs
   pinMode(PIN_LED_SWITCH_1, OUTPUT);
@@ -569,6 +595,11 @@ void setup() {
   pinMode(PIN_LED_SIGNAL_P4, OUTPUT);
   pinMode(PIN_LED_SIGNAL_G1, OUTPUT);
   pinMode(PIN_LED_SIGNAL_G2, OUTPUT);
+
+  pinMode(PIN_LED_ROUTE_1, OUTPUT);
+  pinMode(PIN_LED_ROUTE_2, OUTPUT);
+  pinMode(PIN_LED_ROUTE_3, OUTPUT);
+  pinMode(PIN_LED_ROUTE_4, OUTPUT);
 
   // First make sure the output pins are OK
   update_outputs();
@@ -588,15 +619,26 @@ void setup() {
   levers[SIGNAL_P3].attach(PIN_LEVER_SIGNAL_P3);
   levers[SIGNAL_P4].attach(PIN_LEVER_SIGNAL_P4);
 
+  levers[ROUTE_P1].attach(PIN_LEVER_ROUTE_P1);
+  levers[ROUTE_P2].attach(PIN_LEVER_ROUTE_P2);
+  levers[ROUTE_P3].attach(PIN_LEVER_ROUTE_P3);
+  levers[ROUTE_P4].attach(PIN_LEVER_ROUTE_P4);
+  levers[ROUTE_G1].attach(PIN_LEVER_ROUTE_G1);
+  levers[ROUTE_G2].attach(PIN_LEVER_ROUTE_G2);
+  levers[ROUTE_G3].attach(PIN_LEVER_ROUTE_G3);
+  levers[ROUTE_G4].attach(PIN_LEVER_ROUTE_G4);
+
   levers[TRACK_CONTACT].attach(PIN_TRACK_CONTACT);
+  levers[ROUTE_FIXATION].attach(PIN_BUTTON_ROUTE_FIXATION);
+
   // Set bounce behavior.
   for (int number = 0; number < ARRAY_SIZE; number++) {
     levers[number].interval(200);
   }
-  // TODO Special case: route fixation button should take some seconds to activate.
-  // levers[ROUTE_AP_FIXATION].interval(2000);
+  // Special case: route fixation button should take two second to activate.
+  levers[ROUTE_FIXATION].interval(2000);
+  // TODO: special class handling.
   levers[TRACK_CONTACT].interval(500);
-  // TODO probleem: varieert tussen 1 en 0 volt...
 
   // look up the initial lever positions and update accordingly.
   for (int number = 0; number < ARRAY_SIZE; number++) {
@@ -638,5 +680,10 @@ void loop() {
   update_single_lever_led(PIN_LED_SIGNAL_P4, SIGNAL_P4);
   update_single_lever_led(PIN_LED_SIGNAL_G1, SIGNAL_G1);
   update_single_lever_led(PIN_LED_SIGNAL_G2, SIGNAL_G2);
+
+  update_dual_lever_led(PIN_LED_ROUTE_1, ROUTE_P1, ROUTE_G1);
+  update_dual_lever_led(PIN_LED_ROUTE_2, ROUTE_P2, ROUTE_G2);
+  update_dual_lever_led(PIN_LED_ROUTE_3, ROUTE_P3, ROUTE_G3);
+  update_dual_lever_led(PIN_LED_ROUTE_4, ROUTE_P4, ROUTE_G4);
 
 }
