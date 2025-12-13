@@ -501,37 +501,36 @@ void write_first_line() {
 }
 
 void write_second_line() {
-  char* msg;
-  char* arrow;
-  char* track;
-  arrow = " -- ";
+  char msg[10];
+  char arrow[5];
+  char track;
+  strcpy(arrow, " -- ");
 
   display.setCursor(0,1);
   display.send_string("          ");
 
   display.setCursor(0,1);
-  if (requirements_fulfilled[ROUTE_G1]) {
-    track = "1";
-  }
-  if (requirements_fulfilled[ROUTE_G2]) {
-    track = "2";
-  }
-  if (requirements_fulfilled[ROUTE_G3]) {
-    track = "3";
-  }
-  if (requirements_fulfilled[ROUTE_G4]) {
-    track = "4";
+  if (requirements_fulfilled[ROUTE_G1] ||
+      requirements_fulfilled[ROUTE_G2] ||
+      requirements_fulfilled[ROUTE_G3] ||
+      requirements_fulfilled[ROUTE_G4]) {
+    display.send_string("in");
+  } else {
+    return;
   }
 
+  display.setCursor(2,1);
+  display.send_string(" -- ");
+  display.setCursor(2,1);
   if (current_position[ROUTE_P1] == MINUS ||
       current_position[ROUTE_P2] == MINUS ||
       current_position[ROUTE_P3] == MINUS ||
       current_position[ROUTE_P4] == MINUS) {
     if (current_position[ROUTE_FIXATION] == MINUS) {
-      arrow = "<== ";
+      display.send_string("<== ");
     }
     else {
-      arrow = "<-- ";
+      display.send_string("<-- ");
     }
   }
   if (current_position[ROUTE_G1] == MINUS ||
@@ -539,15 +538,27 @@ void write_second_line() {
       current_position[ROUTE_G3] == MINUS ||
       current_position[ROUTE_G4] == MINUS) {
     if (current_position[ROUTE_FIXATION] == MINUS) {
-      arrow = " ==>";
+      display.send_string(" ==>");
     }
     else {
-      arrow = " -->";
+      display.send_string(" -->");
     }
   }
 
-  sprintf(msg, "in%s%s", arrow, track);
-  display.send_string(msg);
+  display.setCursor(6,1);
+  if (requirements_fulfilled[ROUTE_G1]) {
+    display.send_string("1");
+  }
+  if (requirements_fulfilled[ROUTE_G2]) {
+    display.send_string("2");
+  }
+  if (requirements_fulfilled[ROUTE_G3]) {
+    display.send_string("3");
+  }
+  if (requirements_fulfilled[ROUTE_G4]) {
+    display.send_string("4");
+  }
+
 }
 
 void write_debug_info(int number) {
