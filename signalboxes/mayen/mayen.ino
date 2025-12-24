@@ -475,6 +475,8 @@ void update_blocks() {
     blocked[ROUTE_P4] = true;
     blocked[ROUTE_G1] = true;
     blocked[ROUTE_G2] = true;
+    blocked[ROUTE_G3] = true;
+    blocked[ROUTE_G4] = true;
   }
 
 }
