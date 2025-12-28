@@ -260,6 +260,36 @@ boolean position_is_ok [ARRAY_SIZE] = {
   true,
 };
 
+boolean movement_suggested [ARRAY_SIZE] = {
+  false,  // Route recall
+  false,  // Switch 1
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,  // Signal P1
+  false,
+  false,
+  false,
+  false,  // Signal G1
+  false,
+  false,  // Route G1
+  false,
+  false,
+  false,
+  false,  // Route P1
+  false,
+  false,
+  false,
+  false,  // Route fixation
+  false,  // Rangieren 4-14
+  false,
+  false,
+  false,
+  false,
+};
+
 // Actual levers/buttons/locks.
 Bounce levers [ARRAY_SIZE];
 
@@ -593,27 +623,35 @@ void change_position(int number,
     // TODO: probably activate it? Or increase its bounce value?
     if (current_position[ROUTE_P1] == MINUS) {
       requirements_fulfilled[SIGNAL_P1] = true;
+      movement_suggested[SIGNAL_P1] = true;
     }
     if (current_position[ROUTE_P2] == MINUS) {
       requirements_fulfilled[SIGNAL_P2] = true;
+      movement_suggested[SIGNAL_P2] = true;
     }
     if (current_position[ROUTE_P3] == MINUS) {
       requirements_fulfilled[SIGNAL_P3] = true;
+      movement_suggested[SIGNAL_P3] = true;
     }
     if (current_position[ROUTE_P4] == MINUS) {
       requirements_fulfilled[SIGNAL_P4] = true;
+      movement_suggested[SIGNAL_P4] = true;
     }
     if (current_position[ROUTE_G1] == MINUS) {
       requirements_fulfilled[SIGNAL_G2] = true;  // HP2
+      movement_suggested[SIGNAL_G2] = true;
     }
     if (current_position[ROUTE_G2] == MINUS) {
       requirements_fulfilled[SIGNAL_G2] = true;  // HP2
+      movement_suggested[SIGNAL_G2] = true;
     }
     if (current_position[ROUTE_G3] == MINUS) {
       requirements_fulfilled[SIGNAL_G1] = true;  // HP1
+      movement_suggested[SIGNAL_G1] = true;
     }
     if (current_position[ROUTE_G4] == MINUS) {
       requirements_fulfilled[SIGNAL_G2] = true;  // HP2
+      movement_suggested[SIGNAL_G2] = true;
     }
   }
 
@@ -627,6 +665,52 @@ void change_position(int number,
     levers[TRACK_CONTACT].interval(100);  // Back to normal twitchy behaviour.
     change_position(ROUTE_FIXATION, PLUS);
     requirements_fulfilled[TRACK_CONTACT] = false;
+    // Also suggest moving any enabled routes+signals to be moved back to PLUS. Should
+    // be at most one of each, but since you can only enable (=MINUS) one of each, a
+    // simple approach is fine.
+    if (current_position[ROUTE_P1] == MINUS) {
+      movement_suggested[ROUTE_P1] = true;
+    }
+    if (current_position[ROUTE_P2] == MINUS) {
+      movement_suggested[ROUTE_P2] = true;
+    }
+    if (current_position[ROUTE_P3] == MINUS) {
+      movement_suggested[ROUTE_P3] = true;
+    }
+    if (current_position[ROUTE_P4] == MINUS) {
+      movement_suggested[ROUTE_P4] = true;
+    }
+    if (current_position[ROUTE_G1] == MINUS) {
+      movement_suggested[ROUTE_G1] = true;
+    }
+    if (current_position[ROUTE_G2] == MINUS) {
+      movement_suggested[ROUTE_G2] = true;
+    }
+    if (current_position[ROUTE_G3] == MINUS) {
+      movement_suggested[ROUTE_G3] = true;
+    }
+    if (current_position[ROUTE_G4] == MINUS) {
+      movement_suggested[ROUTE_G4] = true;
+    }
+    if (current_position[SIGNAL_P1] == MINUS) {
+      movement_suggested[SIGNAL_P1] = true;
+    }
+    if (current_position[SIGNAL_P2] == MINUS) {
+      movement_suggested[SIGNAL_P2] = true;
+    }
+    if (current_position[SIGNAL_P3] == MINUS) {
+      movement_suggested[SIGNAL_P3] = true;
+    }
+    if (current_position[SIGNAL_P4] == MINUS) {
+      movement_suggested[SIGNAL_P4] = true;
+    }
+    if (current_position[SIGNAL_G1] == MINUS) {
+      movement_suggested[SIGNAL_G1] = true;
+    }
+    if (current_position[SIGNAL_G2] == MINUS) {
+      movement_suggested[SIGNAL_G2] = true;
+    }
+
   }
 
   // Special case: signals going back to PLUS remove their own "requirements
@@ -655,6 +739,8 @@ void change_position(int number,
 
 void react_to_movement(int number,
                        boolean new_position) {
+  movement_suggested[number] = false;
+
   if (number == ROUTE_FIXATION && new_position == PLUS) {
     // Ignore this, we only want to know if the route fixation button was activated.
     // Deactivation happens via the track contact.
@@ -688,7 +774,20 @@ void update_single_lever_led(int pin, int number) {
   }
   else {
     if (movement_allowed(number)) {
-      digitalWrite(pin, HIGH);
+      // Movement is allowed, see if a movement is suggested.
+      if (movement_suggested[number]) {
+        // Blink the led in a non-obtrusive manner. Just a suggestion.
+        if ((millis() % 1000) > 900) {
+          digitalWrite(pin, LOW);
+        }
+        else {
+          digitalWrite(pin, HIGH);
+        }
+      }
+      else {
+        // Movement is allowed, just switch the led off.
+        digitalWrite(pin, HIGH);
+      }
     }
     else {
       digitalWrite(pin, LOW);
@@ -708,7 +807,19 @@ void update_dual_lever_led(int pin, int number1, int number2) {
   }
   else {
     if (movement_allowed(number1) || movement_allowed(number2)) {
-      digitalWrite(pin, HIGH);
+      if (movement_suggested[number1] || movement_suggested[number2]) {
+        // Blink the led in a non-obtrusive manner. Just a suggestion.
+        if ((millis() % 1000) > 900) {
+          digitalWrite(pin, LOW);
+        }
+        else {
+          digitalWrite(pin, HIGH);
+        }
+      }
+      else {
+        // Movement is allowed, just switch the led off.
+        digitalWrite(pin, HIGH);
+      }
     }
     else {
       digitalWrite(pin, LOW);
