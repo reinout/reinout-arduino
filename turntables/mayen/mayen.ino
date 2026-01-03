@@ -56,11 +56,16 @@ long POS_B4 = 45266;
 long POS_B5 = 38760;
 long POS_B6 = 32471;
 
-long POS_A5 = 77855;
-long POS_A4 = 84045;
-long POS_A3 = 90525;
-long POS_A2 = 101020;
-long POS_A1 = 115910;
+/* long POS_A5 = 77855; */
+/* long POS_A4 = 84045; */
+/* long POS_A3 = 90525; */
+/* long POS_A2 = 101020; */
+/* long POS_A1 = 115910; */
+long POS_A5 = 77455;
+long POS_A4 = 83645;
+long POS_A3 = 90125;
+long POS_A2 = 100820;
+long POS_A1 = 115610;
 
 // "Bouncing" behaviour: move beyond position going towards begin track and then move
 // back.
