@@ -235,6 +235,9 @@ void handle_key(char key) {
     else if (key == '9') {
       new_relative_position(-1000);
     }
+    else if (key == '0') {
+      start_pre_homing();
+    }
   }  // End of 'D'
 
   // Relative movement keys.
